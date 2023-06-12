@@ -2,13 +2,19 @@ import React, {useEffect, useState} from 'react'
 import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import axios from 'axios'
-import {useLocation} from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
 export const CREATE_USER = `${API_URL}/agent/account/createAppAccount`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/getAppDepartment`
 export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/getAppDesignation`
 export const GET_ALL_ACCESS_GROUPS = `${API_URL}/permission/access-group/get-group`
 const profileDetailsSchema = Yup.object().shape({
+  //profile picture file
+  profile_picture: Yup.mixed().test('fileType', 'Only JPG or PNG files are allowed', (value) => {
+    if (!value) return true
+    const supportedFormats = ['image/jpeg', 'image/png', 'image/jpg']
+    const fileType = value.type
+    return supportedFormats.includes(fileType)
+  }),
   //personal information
   first_name: Yup.string().required('First Name is required'),
   last_name: Yup.string().required('Last Name is required'),
@@ -34,6 +40,9 @@ const profileDetailsSchema = Yup.object().shape({
   name_as_per_bank: Yup.string().required('Name as per bank is required'),
   bank_name: Yup.string().required('Bank Name is required'),
   ifsc_code: Yup.string().required('IFSC Code is required'),
+  //contact information
+  number: Yup.string().required('Number is required'),
+  relation: Yup.string().required('Relation is required'),
   //address information
   country: Yup.string().required('Country is required'),
   state: Yup.string().required('State is required'),
@@ -41,6 +50,38 @@ const profileDetailsSchema = Yup.object().shape({
   address: Yup.string().required('Address is required'),
   landmark: Yup.string().required('Landmark is required'),
   pincode: Yup.string().required('Pincode is required'),
+  //file information
+  aadhar_number: Yup.string().length(12).required('Aadhar Number is required'),
+  pan_number: Yup.string().length(10).required('Pan Number is required'),
+  aadhar_card: Yup.mixed().test('fileType', 'Only PDF files are allowed', (value) => {
+    if (!value) return true
+    const supportedFormats = ['application/pdf']
+    return supportedFormats.includes(value.type)
+  }),
+  pan_card: Yup.mixed().test('fileType', 'Only PDF files are allowed', (value) => {
+    if (!value) return true
+    const supportedFormats = ['application/pdf']
+    return supportedFormats.includes(value.type)
+  }),
+  documents: Yup.mixed()
+    .test('fileType', 'Only PDF, DOCX, PPTX, XLSX, and CSV files are allowed', (value) => {
+      if (!value) return true
+      const supportedFormats = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'text/csv',
+      ]
+      return supportedFormats.includes(value.type)
+    })
+    .test('fileSize', 'File size should be within 25MB', (value) => {
+      if (!value) return true
+      const maxFileSize = 25 * 1024 * 1024 // 25MB in bytes
+      return value.size <= maxFileSize
+    })
+    .required('Documents are required')
+    .nullable(),
 })
 
 function CreateEmployee() {
@@ -133,6 +174,7 @@ function CreateEmployee() {
   }
   const initialValues = {
     //profile information
+    profile_picture: [],
     first_name: '',
     last_name: '',
     email: '',
@@ -166,6 +208,12 @@ function CreateEmployee() {
     //contact information
     number: '',
     relation: '',
+    //file information
+    aadhar_number: '',
+    pan_number: '',
+    aadhar_card: [],
+    pan_card: [],
+    documents: [],
   }
   const formik: any = useFormik({
     initialValues,
@@ -181,6 +229,7 @@ function CreateEmployee() {
           url,
           {
             //personal information
+            profile_picture: values.profile_picture,
             first_name: values.first_name,
             last_name: values.last_name,
             email: values.email,
@@ -223,6 +272,12 @@ function CreateEmployee() {
             address: values.address,
             landmark: values.landmark,
             pincode: values.pincode,
+            //file information
+            aadhar_number: values.aadhar_number,
+            aadhar_card: values.aadhar_card,
+            pan_number: values.pan_number,
+            pan_card: values.pan_card,
+            documents: values.documents,
           },
           {
             headers: {
@@ -252,6 +307,34 @@ function CreateEmployee() {
             </div>
           </div>
           <div className='card-body border-top p-9'>
+            {/* Profile Picture */}
+            <div className='row mb-6'>
+              <label className='col-lg-4 col-form-label required fw-bold fs-6'>
+                Profile Picture
+              </label>
+              <div className='col-lg-8'>
+                <div className='row'>
+                  <div className='col-lg-6 fv-row'>
+                    <input
+                      type='file'
+                      accept='.jpg,.png,.jpeg'
+                      className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                      onChange={(event) => {
+                        formik.setFieldValue('profile_picture', event.target.files)
+                      }}
+                    />
+                    <p style={{color: 'lightblue', textAlign: 'right'}}>
+                      (upload only in jpg, png, jpeg format)
+                    </p>
+                    {formik.touched.profile_picture && formik.errors.profile_picture && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>{formik.errors.profile_picture}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
             {/* {First Name} */}
             <div className='row mb-6'>
               <label className='col-lg-4 col-form-label required fw-bold fs-6'>First Name</label>
@@ -447,7 +530,7 @@ function CreateEmployee() {
             aria-controls='kt_account_profile_details'
           >
             <div className='card-title m-0'>
-              <h3 className='fw-bolder m-0'>Edit Work Information</h3>
+              <h3 className='fw-bolder m-0'>Work Information</h3>
             </div>
           </div>
           <div className='card-body border-top p-9'>
@@ -659,7 +742,7 @@ function CreateEmployee() {
           {/* {heading3-edit bank details} */}
           <div className='card-header border-0 cursor-pointer' role='button'>
             <div className='card-title m-0'>
-              <h3 className='fw-bolder m-0'>Edit Bank Information</h3>
+              <h3 className='fw-bolder m-0'>Bank Information</h3>
             </div>
           </div>
           <div className='card-body border-top p-9'>
@@ -752,7 +835,7 @@ function CreateEmployee() {
           {/* {heading4-edit emergency contact information} */}
           <div className='card-header border-0 cursor-pointer'>
             <div className='card-title m-0'>
-              <h3 className='fw-bolder m-0'>Edit Emergency Contact Information</h3>
+              <h3 className='fw-bolder m-0'>Emergency Contact Information</h3>
             </div>
           </div>
           <div className='card-body border-top p-9'>
@@ -808,7 +891,7 @@ function CreateEmployee() {
           {/* {heading5-edit address information} */}
           <div className='card-header border-0 cursor-pointer' role='button'>
             <div className='card-title m-0'>
-              <h3 className='fw-bolder m-0'>Edit Address Information</h3>
+              <h3 className='fw-bolder m-0'>Address Information</h3>
             </div>
           </div>
           <div className='card-body border-top p-9'>
@@ -933,7 +1016,139 @@ function CreateEmployee() {
               </div>
             </div>
           </div>
-
+          {/* {heading6-edit documents} */}
+          <div className='card-header border-0 cursor-pointer' role='button'>
+            <div className='card-title m-0'>
+              <h3 className='fw-bolder m-0'>Files and Documents</h3>
+            </div>
+          </div>
+          <div className='card-body border-top p-9'>
+            {/* {Aadhar Card Number} */}
+            <div className='row mb-6'>
+              <label className='col-lg-4 col-form-label required fw-bold fs-6'>
+                Aadhar Card Number
+              </label>
+              <div className='col-lg-8'>
+                <div className='row'>
+                  <div className='col-lg-6 fv-row'>
+                    <input
+                      type='text'
+                      className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                      {...formik.getFieldProps('aadhar_number')}
+                    />
+                    {formik.touched.aadhar_number && formik.errors.aadhar_number && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>{formik.errors.aadhar_number}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Aadhar card file */}
+            <div className='row mb-6'>
+              <label className='col-lg-4 col-form-label required fw-bold fs-6'>
+                Aadhar Card File
+              </label>
+              <div className='col-lg-8'>
+                <div className='row'>
+                  <div className='col-lg-6 fv-row'>
+                    <input
+                      type='file'
+                      accept='.pdf'
+                      className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                      onChange={(event) => {
+                        formik.setFieldValue('aadhar_card', event.target.files)
+                      }}
+                    />
+                    <p style={{color: 'lightblue', textAlign: 'right'}}>
+                      (upload only in PDF format)
+                    </p>
+                    {formik.touched.aadhar_card && formik.errors.aadhar_card && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>{formik.errors.aadhar_card}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* {Pan Card Number} */}
+            <div className='row mb-6'>
+              <label className='col-lg-4 col-form-label required fw-bold fs-6'>
+                Pan Card Number
+              </label>
+              <div className='col-lg-8'>
+                <div className='row'>
+                  <div className='col-lg-6 fv-row'>
+                    <input
+                      type='text'
+                      className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                      {...formik.getFieldProps('pan_number')}
+                    />
+                    {formik.touched.pan_number && formik.errors.pan_number && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>{formik.errors.pan_number}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Pan card file */}
+            <div className='row mb-6'>
+              <label className='col-lg-4 col-form-label required fw-bold fs-6'>Pan Card File</label>
+              <div className='col-lg-8'>
+                <div className='row'>
+                  <div className='col-lg-6 fv-row'>
+                    <input
+                      type='file'
+                      accept='.pdf'
+                      className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                      onChange={(event) => {
+                        formik.setFieldValue('pan_card', event.target.files)
+                      }}
+                    />
+                    <p style={{color: 'lightblue', textAlign: 'right'}}>
+                      (upload only in PDF format)
+                    </p>
+                    {formik.touched.pan_card && formik.errors.pan_card && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>{formik.errors.pan_card}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* documents */}
+            <div className='row mb-6'>
+              <label className='col-lg-4 col-form-label required fw-bold fs-6'>Documents</label>
+              <div className='col-lg-8'>
+                <div className='row'>
+                  <div className='col-lg-6 fv-row'>
+                    <input
+                      type='file'
+                      multiple
+                      name='documents'
+                      className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                      onChange={(event) => {
+                        formik.setFieldValue('documents', event.target.files)
+                      }}
+                    />
+                    <p style={{color: 'lightblue', textAlign: 'right'}}>
+                      (upload maximum 5 files at a time with size within 25mb)
+                    </p>
+                    {formik.touched.documents && formik.errors.documents && (
+                      <div className='fv-plugins-message-container'>
+                        <div className='fv-help-block'>{formik.errors.documents}</div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
           <div className='card-footer d-flex justify-content-end py-6 px-9'>
             <button type='submit' className='btn btn-primary'>
               {!loading && 'Save Changes'}
@@ -943,6 +1158,16 @@ function CreateEmployee() {
                   <span className='spinner-border spinner-border-sm align-middle ms-2'></span>
                 </span>
               )}
+            </button>
+
+            <button
+              type='button'
+              onClick={() => {
+                formik.resetForm()
+              }}
+              className='btn btn-primary'
+            >
+              {'Clear Form'}
             </button>
           </div>
         </form>

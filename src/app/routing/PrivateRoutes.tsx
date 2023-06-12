@@ -7,6 +7,9 @@ import {MenuTestPage} from '../pages/MenuTestPage'
 import {getCSSVariableValue} from '../../_metronic/assets/ts/_utils'
 import {WithChildren} from '../../_metronic/helpers'
 import BuilderPageWrapper from '../pages/layout-builder/BuilderPageWrapper'
+import DepartmentContextProvider from '../modules/company_fields/context/DepartmentContext'
+import DesignaitonContextProvider from '../modules/company_fields/context/DesignationContext'
+import ReportingManagerContextProvider from '../modules/company_fields/context/ReportingManagerContext'
 
 const PrivateRoutes = () => {
   //permission routes
@@ -22,9 +25,15 @@ const PrivateRoutes = () => {
   )
   const CreateEmployee = lazy(() => import('../modules/employee_management/CreateEmployee'))
   //company fields route
-  const Department = lazy(() => import('../modules/company_fields/Department'))
-  const Designation = lazy(() => import('../modules/company_fields/Designation'))
-  const ReportingManagers = lazy(() => import('../modules/company_fields/ReportingManagers'))
+  const DepartmentActions = lazy(
+    () => import('../modules/company_fields/Department/DepartmentActions')
+  )
+  const DesignationActions = lazy(
+    () => import('../modules/company_fields/Designation/DesignationActions')
+  )
+  const ReportingManagerActions = lazy(
+    () => import('../modules/company_fields/ReportingManager/ReportingManagerActions')
+  )
 
   return (
     <Routes>
@@ -104,7 +113,9 @@ const PrivateRoutes = () => {
           path='crafted/company_fields/department/*'
           element={
             <SuspensedView>
-              <Department />
+              <DepartmentContextProvider>
+                <DepartmentActions />
+              </DepartmentContextProvider>
             </SuspensedView>
           }
         />
@@ -112,7 +123,9 @@ const PrivateRoutes = () => {
           path='crafted/company_fields/designation/*'
           element={
             <SuspensedView>
-              <Designation />
+              <DesignaitonContextProvider>
+                <DesignationActions />
+              </DesignaitonContextProvider>
             </SuspensedView>
           }
         />
@@ -120,7 +133,9 @@ const PrivateRoutes = () => {
           path='crafted/company_fields/reporting-managers/*'
           element={
             <SuspensedView>
-              <ReportingManagers />
+              <ReportingManagerContextProvider>
+                <ReportingManagerActions />
+              </ReportingManagerContextProvider>
             </SuspensedView>
           }
         />

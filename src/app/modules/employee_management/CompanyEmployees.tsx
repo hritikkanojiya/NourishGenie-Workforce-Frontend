@@ -3,6 +3,7 @@ import React, {useEffect} from 'react'
 import {EmployeeCard} from '../../../_metronic/partials/content/cards/EmployeeCard'
 import {PageLink, PageTitle} from '../../../_metronic/layout/core'
 import axios from 'axios'
+import {Link} from 'react-router-dom'
 const permissionsBreadCrumbs: Array<PageLink> = [
   {
     title: 'employee_management',
@@ -104,6 +105,14 @@ function CompanyEmployees() {
             <option value='Accepted'>Accepted</option>
           </select>
         </div>
+        <Link
+          to={'/crafted/employee_management/create-employee'}
+          className='btn btn-primary btn-sm'
+          data-bs-toggle='tooltip'
+          title='Coming soon'
+        >
+          Create a new Genie
+        </Link>
       </div>
       <div className='row g-6 g-xl-9'>
         {employeeCards}
