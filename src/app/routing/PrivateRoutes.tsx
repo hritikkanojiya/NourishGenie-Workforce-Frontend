@@ -34,6 +34,7 @@ const PrivateRoutes = () => {
   const ReportingManagerActions = lazy(
     () => import('../modules/company_fields/ReportingManager/ReportingManagerActions')
   )
+  const CompanyEmp = lazy(() => import('../modules/employee_management/CreateEmp'))
 
   return (
     <Routes>
@@ -85,6 +86,7 @@ const PrivateRoutes = () => {
             </SuspensedView>
           }
         />
+
         <Route
           path='crafted/employee_management/employee-details/*'
           element={
@@ -98,6 +100,14 @@ const PrivateRoutes = () => {
           element={
             <SuspensedView>
               <CreateEmployee />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='crafted/employee_management/create-emp/*'
+          element={
+            <SuspensedView>
+              <CompanyEmp />
             </SuspensedView>
           }
         />

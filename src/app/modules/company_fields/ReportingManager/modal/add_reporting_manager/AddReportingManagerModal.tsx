@@ -45,7 +45,7 @@ const AddReportingManagerModal = () => {
         const result = await axios.post(
           CREATE_REPORTING_MANAGER,
           {
-            ReportingManagerId: values.managerId,
+            appAgentId: values.managerId,
           },
           {
             headers: {

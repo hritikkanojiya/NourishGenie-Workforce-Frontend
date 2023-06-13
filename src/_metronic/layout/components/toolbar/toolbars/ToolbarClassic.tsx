@@ -51,7 +51,7 @@ const ToolbarClassic = () => {
 
       {config.app?.toolbar?.primaryButton && (
         <Link
-          to='/crafted/employee_management/create-employee'
+          to='/crafted/employee_management/create-emp'
           className='btn btn-sm fw-bold btn-primary'
         >
           Create
