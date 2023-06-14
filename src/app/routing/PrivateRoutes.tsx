@@ -10,6 +10,7 @@ import BuilderPageWrapper from '../pages/layout-builder/BuilderPageWrapper'
 import DepartmentContextProvider from '../modules/company_fields/context/DepartmentContext'
 import DesignaitonContextProvider from '../modules/company_fields/context/DesignationContext'
 import ReportingManagerContextProvider from '../modules/company_fields/context/ReportingManagerContext'
+import DynamicFieldsContextProvider from '../modules/employee_management/FieldsContext'
 
 const PrivateRoutes = () => {
   //permission routes
@@ -34,6 +35,7 @@ const PrivateRoutes = () => {
   const ReportingManagerActions = lazy(
     () => import('../modules/company_fields/ReportingManager/ReportingManagerActions')
   )
+  const CreateActions = lazy(() => import('../modules/employee_management/CreateActions'))
   const CompanyEmp = lazy(() => import('../modules/employee_management/CreateEmp'))
 
   return (
@@ -106,9 +108,11 @@ const PrivateRoutes = () => {
         <Route
           path='crafted/employee_management/create-emp/*'
           element={
-            <SuspensedView>
-              <CompanyEmp />
-            </SuspensedView>
+            <DynamicFieldsContextProvider>
+              <SuspensedView>
+                <CreateActions />
+              </SuspensedView>
+            </DynamicFieldsContextProvider>
           }
         />
         <Route

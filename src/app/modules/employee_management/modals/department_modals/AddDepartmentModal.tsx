@@ -2,7 +2,7 @@ import React, {useContext} from 'react'
 import {useFormik} from 'formik'
 import axios from 'axios'
 import * as Yup from 'yup'
-import {DepartmentContext} from '../../../context/DepartmentContext'
+import {DynamicFieldsContext} from '../../FieldsContext'
 const API_URL = process.env.REACT_APP_API_URL
 export const CREATE_DEPARTMENT = `${API_URL}/agent/fields/department/create-department`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
@@ -15,8 +15,7 @@ const departmentValidationSchema = Yup.object().shape({
     .matches(/^[a-zA-Z\s]+$/, 'Department Description cannot contain numbers'),
 })
 const AddDepartmentModal = () => {
-  const {loadDepartmentFunction} = useContext(DepartmentContext)
-  const {modalFunction} = useContext(DepartmentContext)
+  const {modalFunction} = useContext(DynamicFieldsContext)
   //load all the departments from the backend
   async function load_departments() {
     const varToken = localStorage.getItem('token')
@@ -32,7 +31,6 @@ const AddDepartmentModal = () => {
           },
         }
       )
-      loadDepartmentFunction(result.data.data.AppDepartment)
       if (result.data.error === false) {
       }
     } catch (err) {

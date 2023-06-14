@@ -4,9 +4,9 @@ import axios from 'axios'
 import * as Yup from 'yup'
 import {DepartmentContext} from '../../../context/DepartmentContext'
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_ALL_DETAILS = `${API_URL}/agent/fields/department/getSingleDepartment`
-export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/getAppDepartment`
-export const UPDATE_DEPARTMENT = `${API_URL}/agent/fields/department/updateAppDepartment`
+export const GET_ALL_DETAILS = `${API_URL}/agent/fields/department/get-single-department`
+export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
+export const UPDATE_DEPARTMENT = `${API_URL}/agent/fields/department/update-department`
 
 const departmentValidationSchema = Yup.object().shape({
   department_name: Yup.string()
@@ -21,6 +21,7 @@ const EditDepartmentModal = () => {
   const {loadDepartmentFunction} = useContext(DepartmentContext)
   const {editModalFunction} = useContext(DepartmentContext)
   const {departmentId} = useContext(DepartmentContext)
+  console.log(departmentId)
   const [data, setData] = React.useState<any>({})
   //load the department details from the backend
   useEffect(() => {
@@ -36,11 +37,11 @@ const EditDepartmentModal = () => {
       const result = await axios.post(
         GET_ALL_DEPARTMENTS,
         {
-          search: '',
+          search: null,
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
@@ -61,11 +62,11 @@ const EditDepartmentModal = () => {
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
-      setData(result.data.data.department)
+      setData(result.data.data.appDepartment)
       if (result.data.error === false) {
       }
     } catch (err) {
@@ -91,7 +92,7 @@ const EditDepartmentModal = () => {
           },
           {
             headers: {
-              Authorization: 'Bearer ' + varToken,
+              genie_access_token: 'Bearer ' + varToken,
             },
           }
         )

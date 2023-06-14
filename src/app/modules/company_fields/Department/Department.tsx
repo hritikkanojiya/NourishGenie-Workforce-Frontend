@@ -21,8 +21,8 @@ const permissionsBreadCrumbs: Array<PageLink> = [
 ]
 
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/getAppDepartment`
-export const DELETE_DEPARTMENT = `${API_URL}/agent/fields/department/deleteAppDepartment`
+export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
+export const DELETE_DEPARTMENT = `${API_URL}/agent/fields/department/delete-department`
 
 function Department() {
   const {modalFunction, editModalFunction} = useContext(DepartmentContext)
@@ -44,7 +44,7 @@ function Department() {
       const result = await axios.post(
         GET_ALL_DEPARTMENTS,
         {
-          search: search,
+          search: search ? search : null,
           metaData: {
             limit: itemsPerPage,
             offset: (currentPage - 1) * itemsPerPage,
@@ -52,7 +52,7 @@ function Department() {
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
@@ -81,7 +81,7 @@ function Department() {
       },
       {
         headers: {
-          Authorization: 'Bearer ' + varToken,
+          genie_access_token: 'Bearer ' + varToken,
         },
       }
     )
@@ -145,13 +145,13 @@ function Department() {
         </thead>
         <tbody>
           {departments.map((department: any, index: number) => (
-            <tr key={department.AppDepartmentId}>
+            <tr key={department.appDepartmentId}>
               <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
               <td>{department.name}</td>
               <td>
                 <Dropdown>
                   <Dropdown.Toggle
-                    id={`dropdown-${department.AppDepartmentId}`}
+                    id={`dropdown-${department.appDepartmentId}`}
                     className=' bg-transparent'
                   >
                     Actions
@@ -160,13 +160,13 @@ function Department() {
                   <Dropdown.Menu>
                     <Dropdown.Item
                       className='dropdown-item'
-                      onClick={() => handleEdit(department.AppDepartmentId)}
+                      onClick={() => handleEdit(department.appDepartmentId)}
                     >
                       Edit
                     </Dropdown.Item>
                     <Dropdown.Item
                       className='dropdown-item'
-                      onClick={() => deleteDepartment(department.AppDepartmentId)}
+                      onClick={() => deleteDepartment(department.appDepartmentId)}
                     >
                       Delete
                     </Dropdown.Item>
