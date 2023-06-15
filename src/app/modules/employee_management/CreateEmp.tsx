@@ -16,19 +16,27 @@ export const GET_ALL_ACCESS_GROUPS = `${API_URL}/permission/access-group/get-gro
 export const GET_ALL_MANAGERS = `${API_URL}/agent/fields/reporting_manager/get-manager`
 const ProfileCard = () => {
   const profileDetailsSchema = Yup.object().shape({
-    profile_picture: Yup.mixed().test('fileType', 'Only JPG or PNG files are allowed', (value) => {
-      if (!value) return true
-      const supportedFormats = ['image/jpeg', 'image/png', 'image/jpg']
-      const fileType = value.type
-      return supportedFormats.includes(fileType)
-    }),
+    profile_picture: Yup.mixed()
+      .test('fileFormat', 'Invalid file format', (value) => {
+        if (value && value.length > 0) {
+          const allowedFormats = ['image/jpeg', 'image/png', 'image/jpg']
+          for (let i = 0; i < value.length; i++) {
+            const file = value[i]
+            if (!allowedFormats.includes(file.type)) {
+              return false
+            }
+          }
+        }
+        return true // Allow empty field if required
+      })
+      .required('Please upload a profile picture'),
     //personal information
     first_name: Yup.string().required('First Name is required'),
     last_name: Yup.string().required('Last Name is required'),
     email: Yup.string().required('Email is required'),
     password: Yup.string().required('Password is required'),
     employee_type: Yup.string().required('Employee Type is required'),
-    //appReportingManagerId: Yup.string().required('Reporting Manager is required'),
+    appReportingManagerId: Yup.string().required('Reporting Manager is required'),
     appDepartmentId: Yup.string().required('Department is required'),
     appDesignationId: Yup.string().required('Designation is required'),
     appAccessGroupId: Yup.string().required('Access Groups is required'),
@@ -57,6 +65,58 @@ const ProfileCard = () => {
     address: Yup.string().required('Address is required'),
     landmark: Yup.string().required('Landmark is required'),
     pincode: Yup.string().required('Pincode is required'),
+    //file information
+    aadhar_number: Yup.string().required('Aadhar Number is required'),
+    pan_number: Yup.string().required('Pan Number is required'),
+    aadhar_card: Yup.mixed()
+      .test('fileFormat', 'Only PDF files are allowed', (value) => {
+        if (value && value.length > 0) {
+          const file = value[0]
+          return file.type === 'application/pdf'
+        }
+        return true // Allow empty field if required
+      })
+      .required('Please upload a PDF file'),
+    pan_card: Yup.mixed().test('fileType', 'Only PDF files are allowed', (value) => {
+      if (!value) return true
+      const supportedFormats = ['application/pdf']
+      return supportedFormats.includes(value.type)
+    }),
+    documents: Yup.array()
+      .nullable()
+      .max(5, 'You can upload a maximum of 5 files')
+      .test('fileFormat', 'Invalid file format', (value) => {
+        if (value && value.length > 0) {
+          const allowedFormats = [
+            'application/pdf',
+            'application/msword',
+            'application/vnd.ms-powerpoint',
+            'application/vnd.ms-excel',
+            'text/csv',
+          ]
+
+          for (let i = 0; i < value.length; i++) {
+            const file = value[i]
+            if (!allowedFormats.includes(file.type)) {
+              return false
+            }
+          }
+        }
+        return true // Allow empty field if required
+      })
+      .test('fileSize', 'File size exceeds the limit', (value) => {
+        if (value && value.length > 0) {
+          const maxSizeInBytes = 25 * 1024 * 1024 // 25 MB
+
+          for (let i = 0; i < value.length; i++) {
+            const file = value[i]
+            if (file.size > maxSizeInBytes) {
+              return false
+            }
+          }
+        }
+        return true // Allow empty field if required
+      }),
   })
   useEffect(() => {
     ;(async () => {
@@ -67,12 +127,19 @@ const ProfileCard = () => {
     })()
   }, [])
   const [loading, setLoading] = useState(false)
-  const [dept, setDepartments] = useState<any>([])
-  const [designations, setDesignation] = useState<any>([])
-  const [accessGroup, setAccessGroup] = useState<any>([])
-  const [managers, setManagers] = useState<any>([])
+  const {loadDepartmentFunction} = useContext(DynamicFieldsContext)
+  const {loadDesignationFunction} = useContext(DynamicFieldsContext)
+  const {loadReportingManagerFunction} = useContext(DynamicFieldsContext)
+  const {loadAccessGroupFunction} = useContext(DynamicFieldsContext)
+  const {departments} = useContext(DynamicFieldsContext)
+  const {designations} = useContext(DynamicFieldsContext)
+  const {reportingManagers} = useContext(DynamicFieldsContext)
+  const {accessGroups} = useContext(DynamicFieldsContext)
   const [date, setDate] = useState<Dayjs | null>(dayjs('2022-04-17'))
-  const {modalFunction} = useContext(DynamicFieldsContext)
+  const {DepartmentmodalFunction} = useContext(DynamicFieldsContext)
+  const {DesignationmodalFunction} = useContext(DynamicFieldsContext)
+  const {ManagermodalFunction} = useContext(DynamicFieldsContext)
+  const {AccessGroupmodalFunction} = useContext(DynamicFieldsContext)
   const initialValues = {
     //profile information
     profile_picture: [],
@@ -80,7 +147,7 @@ const ProfileCard = () => {
     last_name: '',
     email: '',
     employee_type: '',
-    //appReportingManagerId:'',
+    appReportingManagerId: '',
     appDepartmentId: '',
     appDesignationId: '',
     appAccessGroupId: '',
@@ -130,7 +197,8 @@ const ProfileCard = () => {
           },
         }
       )
-      setManagers(result.data.data.appReportingManager)
+
+      loadReportingManagerFunction(result.data.data.appReportingManager)
     } catch (err) {
       console.log(err)
     }
@@ -150,9 +218,10 @@ const ProfileCard = () => {
           },
         }
       )
-      setDepartments(result.data.data.AppDepartment)
+
+      loadDepartmentFunction(result.data.data.AppDepartment)
       if (result.data.error === false) {
-        console.log(dept)
+        console.log(departments)
       }
     } catch (err) {
       console.log(err)
@@ -173,7 +242,8 @@ const ProfileCard = () => {
           },
         }
       )
-      setDesignation(result.data.data.AppDesignation)
+
+      loadDesignationFunction(result.data.data.appDesignations)
       if (result.data.error === false) {
       }
     } catch (err) {
@@ -203,7 +273,7 @@ const ProfileCard = () => {
           },
         }
       )
-      setAccessGroup(result.data.data.appAccessGroups)
+      loadAccessGroupFunction(result.data.data.appAccessGroups)
       if (result.data.error === false) {
       }
     } catch (err) {
@@ -216,11 +286,22 @@ const ProfileCard = () => {
     validationSchema: profileDetailsSchema,
     onSubmit: (values) => {
       // Handle form submission logic here
+      alert('data submitted')
       console.log(values)
+      const varToken = localStorage.getItem('token')
     },
   })
-  function handleModalOpen() {
-    modalFunction(true)
+  function handleDepartmentModalOpen() {
+    DepartmentmodalFunction(true)
+  }
+  function handleDesignationModalOpen() {
+    DesignationmodalFunction(true)
+  }
+  function reportingManagerModalOpen() {
+    ManagermodalFunction(true)
+  }
+  function accessGroupModalOpen() {
+    AccessGroupmodalFunction(true)
   }
   return (
     <form onSubmit={formik.handleSubmit}>
@@ -260,8 +341,7 @@ const ProfileCard = () => {
                 type='text'
                 style={{margin: '10px', width: '60%'}}
                 className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                // {...formik.getFieldProps('first_name')}
-                onChange={formik.handleChange}
+                {...formik.getFieldProps('first_name')}
               />
               {formik.touched.first_name && formik.errors.first_name && (
                 <div className='fv-plugins-message-container'>
@@ -276,8 +356,7 @@ const ProfileCard = () => {
                 type='text'
                 style={{margin: '10px', width: '60%'}}
                 className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                // {...formik.getFieldProps('first_name')}
-                onChange={formik.handleChange}
+                {...formik.getFieldProps('last_name')}
               />
               {formik.touched.last_name && formik.errors.last_name && (
                 <div className='fv-plugins-message-container'>
@@ -292,8 +371,7 @@ const ProfileCard = () => {
                 type='text'
                 style={{margin: '10px', width: '60%'}}
                 className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                // {...formik.getFieldProps('first_name')}
-                onChange={formik.handleChange}
+                {...formik.getFieldProps('email')}
               />
               {formik.touched.email && formik.errors.email && (
                 <div className='fv-plugins-message-container'>
@@ -709,7 +787,7 @@ const ProfileCard = () => {
                       {...formik.getFieldProps('appDepartmentId')}
                     >
                       <option value=''>Select Department</option>
-                      {dept.map((dep: any) => (
+                      {departments.map((dep: any) => (
                         <option key={dep.appDepartmentId} value={dep.appDepartmentId}>
                           {dep.name}
                         </option>
@@ -719,7 +797,7 @@ const ProfileCard = () => {
                     <button
                       style={{background: 'transparent', border: 'none'}}
                       type='button'
-                      onClick={handleModalOpen}
+                      onClick={handleDepartmentModalOpen}
                     >
                       <i className='fas fa-plus'></i>
                     </button>
@@ -740,12 +818,9 @@ const ProfileCard = () => {
                       {...formik.getFieldProps('appDesignationId')}
                     >
                       <option value=''>Select Designation</option>
-                      {designations.map((designation: any) => (
-                        <option
-                          key={designation.AppDesignationId}
-                          value={designation.AppDesignationId}
-                        >
-                          {designation.name}
+                      {designations.map((dn: any) => (
+                        <option key={dn.appDesignationId} value={dn.appDesignationId}>
+                          {dn.name}
                         </option>
                       ))}
                     </select>
@@ -753,7 +828,7 @@ const ProfileCard = () => {
                     <button
                       style={{background: 'transparent', border: 'none'}}
                       type='button'
-                      onClick={handleModalOpen}
+                      onClick={handleDesignationModalOpen}
                     >
                       <i className='fas fa-plus'></i>
                     </button>
@@ -774,7 +849,7 @@ const ProfileCard = () => {
                       {...formik.getFieldProps('appAccessGroupId')}
                     >
                       <option value=''>Select Access Groups</option>
-                      {accessGroup.map((agroup: any) => (
+                      {accessGroups.map((agroup: any) => (
                         <option key={agroup.appAccessGroupId} value={agroup.appAccessGroupId}>
                           {agroup.name}
                         </option>
@@ -783,7 +858,7 @@ const ProfileCard = () => {
                     <button
                       style={{background: 'transparent', border: 'none'}}
                       type='button'
-                      onClick={handleModalOpen}
+                      onClick={accessGroupModalOpen}
                     >
                       <i className='fas fa-plus'></i>
                     </button>
@@ -801,28 +876,29 @@ const ProfileCard = () => {
                     <select
                       style={{margin: '10px', width: '80%'}}
                       className='form-select form-select-lg form-select-solid'
-                      {...formik.getFieldProps('reportingManagerId')}
+                      {...formik.getFieldProps('appReportingManagerId')}
                     >
                       <option value=''>Select Reporting Manager</option>
-                      {managers.map((manager: any) => (
+                      {reportingManagers.map((manager: any) => (
                         <option key={manager.appManagerId} value={manager.appManagerId}>
-                          {manager.appAgentId}
+                          {manager.appAgentId.email}
                         </option>
                       ))}
                     </select>
-                    {formik.touched.reportingManagerId && formik.errors.reportingManagerId && (
-                      <div className='fv-plugins-message-container'>
-                        <div className='fv-help-block'>{formik.errors.reportingManagerId}</div>
-                      </div>
-                    )}
+
                     <button
                       style={{background: 'transparent', border: 'none'}}
                       type='button'
-                      onClick={handleModalOpen}
+                      onClick={reportingManagerModalOpen}
                     >
                       <i className='fas fa-plus'></i>
                     </button>
                   </div>
+                  {formik.touched.appReportingManagerId && formik.errors.appReportingManagerId && (
+                    <div className='fv-plugins-message-container'>
+                      <div className='fv-help-block'>{formik.errors.appReportingManagerId}</div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -943,14 +1019,17 @@ const ProfileCard = () => {
               {/* <label htmlFor='aadhar_number'>Pan File:</label> */}
               <label htmlFor='pan_card'>Pan File:</label>
               <input
-                type='text'
+                type='file'
+                accept='.pdf'
                 className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                {...formik.getFieldProps('pan_card')}
+                onChange={(event) => {
+                  formik.setFieldValue('aadhar_card', event.target.files)
+                }}
               />
               <p style={{color: 'red', textAlign: 'right'}}>(upload only in PDF format)</p>
-              {formik.touched.pan_card && formik.errors.pan_card && (
+              {formik.touched.aadhar_card && formik.errors.aadhar_card && (
                 <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.pan_card}</div>
+                  <div className='fv-help-block'>{formik.errors.aadhar_card}</div>
                 </div>
               )}
             </div>
@@ -979,6 +1058,18 @@ const ProfileCard = () => {
           </div>
         </div>
       </div>
+      <button
+        type='button'
+        onClick={() => {
+          formik.resetForm()
+        }}
+        className='btn btn-primary'
+      >
+        {'Clear Form'}
+      </button>
+      <button type='submit' className='btn btn-primary'>
+        Submit Changes
+      </button>
     </form>
   )
 }

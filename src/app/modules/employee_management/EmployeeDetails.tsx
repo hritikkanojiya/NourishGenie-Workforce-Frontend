@@ -3,7 +3,7 @@ import {useEffect} from 'react'
 import React from 'react'
 import {useLocation} from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_USER_DETAILS = `${API_URL}/agent/account/getSingleUserDetails`
+export const GET_USER_DETAILS = `${API_URL}/agent/account/get-agent-details`
 function EmployeeDetails() {
   const location: any = useLocation()
   const [details, setDetails] = React.useState<any>({})
@@ -22,11 +22,11 @@ function EmployeeDetails() {
       const result = await axios.post(
         GET_USER_DETAILS,
         {
-          appUserId: id,
+          appAgentId: id,
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )

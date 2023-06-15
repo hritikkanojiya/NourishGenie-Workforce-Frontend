@@ -4,10 +4,10 @@ import {useFormik} from 'formik'
 import axios from 'axios'
 import {useLocation} from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_USER_UPDATE_DETAILS = `${API_URL}/agent/account/updateAppAccount`
-export const GET_USER_DETAILS = `${API_URL}/agent/account/getSingleUserDetails`
-export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/getAppDepartment`
-export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/getAppDesignation`
+export const GET_USER_UPDATE_DETAILS = `${API_URL}/agent/account/update-agents`
+export const GET_USER_DETAILS = `${API_URL}/agent/account/get-agent-details`
+export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
+export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
 export const GET_ALL_ACCESS_GROUPS = `${API_URL}/permission/access-group/get-group`
 const profileDetailsSchema = Yup.object().shape({
   //personal information

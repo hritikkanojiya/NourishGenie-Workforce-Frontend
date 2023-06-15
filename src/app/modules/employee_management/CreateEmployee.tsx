@@ -3,9 +3,9 @@ import * as Yup from 'yup'
 import {useFormik} from 'formik'
 import axios from 'axios'
 const API_URL = process.env.REACT_APP_API_URL
-export const CREATE_USER = `${API_URL}/agent/account/createAppAccount`
-export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/getAppDepartment`
-export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/getAppDesignation`
+export const CREATE_USER = `${API_URL}/agent/account/create-agent`
+export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
+export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
 export const GET_ALL_ACCESS_GROUPS = `${API_URL}/permission/access-group/get-group`
 const profileDetailsSchema = Yup.object().shape({
   //profile picture file
@@ -109,7 +109,7 @@ function CreateEmployee() {
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
@@ -131,7 +131,7 @@ function CreateEmployee() {
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
@@ -161,7 +161,7 @@ function CreateEmployee() {
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
@@ -222,11 +222,10 @@ function CreateEmployee() {
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setLoading(true)
       console.log(values)
-      const url = CREATE_USER
       const varToken = localStorage.getItem('token')
       try {
         const res = await axios.post(
-          url,
+          CREATE_USER,
           {
             //personal information
             profile_picture: values.profile_picture,
@@ -281,7 +280,7 @@ function CreateEmployee() {
           },
           {
             headers: {
-              Authorization: 'Bearer ' + varToken,
+              genie_access_token: 'Bearer ' + varToken,
             },
           }
         )

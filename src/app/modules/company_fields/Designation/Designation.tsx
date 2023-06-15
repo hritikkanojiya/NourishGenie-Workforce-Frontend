@@ -22,8 +22,8 @@ const permissionsBreadCrumbs: Array<PageLink> = [
 ]
 
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_ALL_DesignationS = `${API_URL}/agent/fields/Designation/getAppDesignation`
-export const DELETE_Designation = `${API_URL}/agent/fields/Designation/deleteAppDesignation`
+export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
+export const DELETE_Designation = `${API_URL}/agent/fields/designation/delete-designation`
 
 function Designation() {
   const [search, setSearch] = React.useState('')
@@ -44,9 +44,9 @@ function Designation() {
     const varToken = localStorage.getItem('token')
     try {
       const result = await axios.post(
-        GET_ALL_DesignationS,
+        GET_ALL_DESIGNATIONS,
         {
-          search: search,
+          search: search ? search : 'e',
           metaData: {
             limit: itemsPerPage,
             offset: (currentPage - 1) * itemsPerPage,
@@ -54,11 +54,11 @@ function Designation() {
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
-      loadDesignationFunction(result.data.data.AppDesignation)
+      loadDesignationFunction(result.data.data.appDesignations)
       setTotalRecords(result.data.data.metaData.total_records)
       if (result.data.error === false) {
       }
@@ -66,25 +66,25 @@ function Designation() {
       console.log(err)
     }
   }
-  function handleEdit(AppDesignationId: any): void {
+  function handleEdit(appDesignationId: any): void {
     editModalFunction(true)
-    editDesignationId(AppDesignationId)
+    editDesignationId(appDesignationId)
   }
   function handleCreateDesignation(): void {
     modalFunction(true)
   }
 
-  async function delete_Designation(AppDesignationId: any) {
-    console.log(AppDesignationId)
+  async function delete_Designation(appDesignationId: any) {
+    console.log(appDesignationId)
     const varToken = localStorage.getItem('token')
     const result = await axios.post(
       DELETE_Designation,
       {
-        appDesignationId: [AppDesignationId],
+        appDesignationId: [appDesignationId],
       },
       {
         headers: {
-          Authorization: 'Bearer ' + varToken,
+          genie_access_token: 'Bearer ' + varToken,
         },
       }
     )
@@ -152,13 +152,13 @@ function Designation() {
         </thead>
         <tbody>
           {designations.map((Designation: any, index: number) => (
-            <tr key={Designation.AppDesignationId}>
+            <tr key={Designation.appDesignationId}>
               <td>{index + 1}</td>
               <td>{Designation.name}</td>
               <td>
                 <Dropdown>
                   <Dropdown.Toggle
-                    id={`dropdown-${Designation.AppDesignationId}`}
+                    id={`dropdown-${Designation.appDesignationId}`}
                     className=' bg-transparent'
                   >
                     Actions
@@ -167,14 +167,14 @@ function Designation() {
                   <Dropdown.Menu>
                     <Dropdown.Item
                       className='dropdown-item'
-                      onClick={() => handleEdit(Designation.AppDesignationId)}
+                      onClick={() => handleEdit(Designation.appDesignationId)}
                     >
                       Edit
                       {}
                     </Dropdown.Item>
                     <Dropdown.Item
                       className='dropdown-item'
-                      onClick={() => delete_Designation(Designation.AppDesignationId)}
+                      onClick={() => delete_Designation(Designation.appDesignationId)}
                     >
                       Delete
                     </Dropdown.Item>

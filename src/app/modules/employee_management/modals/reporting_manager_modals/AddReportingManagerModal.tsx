@@ -1,7 +1,7 @@
 import React, {useContext, useEffect} from 'react'
 import {useFormik} from 'formik'
 import axios from 'axios'
-import {ReportingManagerContext} from '../../../context/ReportingManagerContext'
+import {DynamicFieldsContext} from '../../FieldsContext'
 const API_URL = process.env.REACT_APP_API_URL
 export const GET_ALL_MANAGERS = `${API_URL}/agent/fields/reporting_manager/get-manager`
 export const CREATE_REPORTING_MANAGER = `${API_URL}/agent/fields/reporting_manager/create-manager`
@@ -9,8 +9,8 @@ export const GET_NON_MANAGER_EMPLOYEES = `${API_URL}/agent/fields/reporting_mana
 
 const AddReportingManagerModal = () => {
   const [nonManagers, setNonManagers] = React.useState<any[]>([])
-  const {modalFunction} = useContext(ReportingManagerContext)
-  const {loadReportingManagerFunction} = useContext(ReportingManagerContext)
+  const {ManagermodalFunction} = useContext(DynamicFieldsContext)
+  const {loadReportingManagerFunction} = useContext(DynamicFieldsContext)
   useEffect(() => {
     get_non_managers()
   }, [])
@@ -29,6 +29,7 @@ const AddReportingManagerModal = () => {
       )
       if (result.data.error === false) {
         loadReportingManagerFunction(result.data.data.appReportingManager)
+        ManagermodalFunction(false)
       }
     } catch (err) {
       console.log(err)
@@ -56,8 +57,8 @@ const AddReportingManagerModal = () => {
         // Reset the form after successful submission
         formik.resetForm()
         if (result.data.error === false) {
+          ManagermodalFunction(false)
           await load_managers()
-          modalFunction(false)
         }
       } catch (error) {
         console.log(error)

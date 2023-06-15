@@ -21,8 +21,8 @@ const permissionsBreadCrumbs: Array<PageLink> = [
   },
 ]
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_ALL_MANAGERS = `${API_URL}/agent/fields/reporting_manager/getAppReportingManager`
-export const DELETE_MANAGER = `${API_URL}/agent/fields/reporting_manager/deleteAppReportingManager`
+export const GET_ALL_MANAGERS = `${API_URL}/agent/fields/reporting_manager/get-manager`
+export const DELETE_MANAGER = `${API_URL}/agent/fields/reporting_manager/delete-manager`
 
 function ReportingManagers() {
   useEffect(() => {
@@ -45,12 +45,12 @@ function ReportingManagers() {
         {},
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
       if (result.data.error === false) {
-        loadReportingManagerFunction(result.data.data.AppReportingManager)
+        loadReportingManagerFunction(result.data.data.appReportingManager)
         setTotalRecords(result.data.data.metaData.total_records)
       }
     } catch (err) {
@@ -58,16 +58,16 @@ function ReportingManagers() {
     }
   }
 
-  async function delete_manager(AppReportingManagerId: any) {
+  async function delete_manager(appManagerId: any) {
     const varToken = localStorage.getItem('token')
     const result = await axios.post(
       DELETE_MANAGER,
       {
-        ReportingManagerId: [AppReportingManagerId],
+        appManagerId: [appManagerId],
       },
       {
         headers: {
-          Authorization: 'Bearer ' + varToken,
+          genie_access_token: 'Bearer ' + varToken,
         },
       }
     )
@@ -131,19 +131,22 @@ function ReportingManagers() {
         </thead>
         <tbody>
           {ReportingManagers.map((manager: any, index: number) => (
-            <tr key={manager._id}>
+            <tr key={manager.appManagerId}>
               <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
-              <td>{manager.appUserId.email}</td>
+              <td>{manager.appAgentId.email}</td>
               <td>
                 <Dropdown>
-                  <Dropdown.Toggle id={`dropdown-${manager._id}`} className=' bg-transparent'>
+                  <Dropdown.Toggle
+                    id={`dropdown-${manager.appManagerId}`}
+                    className=' bg-transparent'
+                  >
                     Actions
                   </Dropdown.Toggle>
 
                   <Dropdown.Menu>
                     <Dropdown.Item
                       className='dropdown-item'
-                      onClick={() => delete_manager(manager._id)}
+                      onClick={() => delete_manager(manager.appManagerId)}
                     >
                       Delete
                     </Dropdown.Item>

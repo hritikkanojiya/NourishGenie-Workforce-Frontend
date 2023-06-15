@@ -2,7 +2,7 @@ import {KTSVG} from '../../../../../_metronic/helpers'
 import {useContext} from 'react'
 import {DynamicFieldsContext} from '../../FieldsContext'
 const DepartmentModalHeader = () => {
-  const {modalFunction} = useContext(DynamicFieldsContext)
+  const {DepartmentmodalFunction} = useContext(DynamicFieldsContext)
   return (
     <div className='modal-header'>
       <h2 className='fw-bolder'>Create New Department</h2>
@@ -10,7 +10,7 @@ const DepartmentModalHeader = () => {
         className='btn btn-icon btn-sm btn-active-icon-primary'
         data-kt-users-modal-action='close'
         onClick={() => {
-          modalFunction(false)
+          DepartmentmodalFunction(false)
         }}
         style={{cursor: 'pointer'}}
       >

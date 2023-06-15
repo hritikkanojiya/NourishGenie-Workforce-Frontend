@@ -20,8 +20,8 @@ const permissionsBreadCrumbs: Array<PageLink> = [
 ]
 
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_ALL_USERS = `${API_URL}/agent/account/getAllAppAccount`
-export const DELETE_SINGLE_USER = `${API_URL}/agent/account/deleteAppAccount/`
+export const GET_ALL_USERS = `${API_URL}/agent/account/get-agents`
+export const DELETE_SINGLE_USER = `${API_URL}/agent/account/delete-agent`
 function CompanyEmployees() {
   const [employees, setEmployees] = React.useState([])
   //api calling
@@ -33,11 +33,8 @@ function CompanyEmployees() {
   async function Load(parameter?: any) {
     const varToken = localStorage.getItem('token')
     const result = await axios.get(GET_ALL_USERS, {
-      params: {
-        sort: parameter,
-      },
       headers: {
-        Authorization: 'Bearer ' + varToken,
+        genie_access_token: 'Bearer ' + varToken,
       },
     })
     console.log(result.data.data.AppUsers)
@@ -52,7 +49,7 @@ function CompanyEmployees() {
       },
       {
         headers: {
-          Authorization: 'Bearer ' + varToken,
+          genie_access_token: 'Bearer ' + varToken,
         },
       }
     )

@@ -1,16 +1,16 @@
-import {KTSVG} from '../../../../../../_metronic/helpers'
+import {KTSVG} from '../../../../../_metronic/helpers'
 import {useContext} from 'react'
-import {ReportingManagerContext} from '../../../context/ReportingManagerContext'
-const ManagerModalHeader = () => {
-  const {modalFunction} = useContext(ReportingManagerContext)
+import {DynamicFieldsContext} from '../../FieldsContext'
+const DepartmentModalHeader = () => {
+  const {AccessGroupmodalFunction} = useContext(DynamicFieldsContext)
   return (
     <div className='modal-header'>
-      <h2 className='fw-bolder'>Create New Reporting Manager</h2>
+      <h2 className='fw-bolder'>Create New Access Group</h2>
       <div
         className='btn btn-icon btn-sm btn-active-icon-primary'
         data-kt-users-modal-action='close'
         onClick={() => {
-          modalFunction(false)
+          AccessGroupmodalFunction(false)
         }}
         style={{cursor: 'pointer'}}
       >
@@ -20,4 +20,4 @@ const ManagerModalHeader = () => {
   )
 }
 
-export default ManagerModalHeader
+export default DepartmentModalHeader
