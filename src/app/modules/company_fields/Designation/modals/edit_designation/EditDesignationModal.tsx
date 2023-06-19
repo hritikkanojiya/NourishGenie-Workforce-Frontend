@@ -1,12 +1,12 @@
 import React, {useContext, useEffect} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../../../../RequestConfig'
 import * as Yup from 'yup'
 import {DesignationContext} from '../../../context/DesignationContext'
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_ALL_DETAILS = `${API_URL}/agent/fields/Designation/getSingleDesignation`
-export const GET_ALL_DesignationS = `${API_URL}/agent/fields/Designation/getAppDesignation`
-export const UPDATE_Designation = `${API_URL}/agent/fields/Designation/updateAppDesignation`
+export const GET_ALL_DETAILS = `${API_URL}/agent/fields/designation/get-single-designation`
+export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
+export const UPDATE_DESIGNATION = `${API_URL}/agent/fields/designation/update-designation`
 
 const DesignationValidationSchema = Yup.object().shape({
   Designation_name: Yup.string()
@@ -33,18 +33,18 @@ const EditDesignationModal = () => {
   async function load_Designations() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
-        GET_ALL_DesignationS,
+      const result = await api.post(
+        GET_ALL_DESIGNATIONS,
         {
-          search: '',
+          search: null,
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
-      loadDesignationFunction(result.data.data.AppDesignation)
+      loadDesignationFunction(result.data.data.appDesignations)
       if (result.data.error === false) {
       }
     } catch (err) {
@@ -53,19 +53,21 @@ const EditDesignationModal = () => {
   }
   async function load_details() {
     const varToken = localStorage.getItem('token')
+    console.log(designationId)
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_DETAILS,
         {
           appDesignationId: designationId,
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
-      setData(result.data.data.designation)
+      console.log(result.data.data)
+      setData(result.data.data.appDesignation)
       if (result.data.error === false) {
       }
     } catch (err) {
@@ -82,8 +84,8 @@ const EditDesignationModal = () => {
     onSubmit: async (values) => {
       try {
         const varToken = localStorage.getItem('token')
-        const result = await axios.patch(
-          UPDATE_Designation,
+        const result = await api.put(
+          UPDATE_DESIGNATION,
           {
             appDesignationId: designationId,
             name: values.Designation_name,
@@ -91,7 +93,7 @@ const EditDesignationModal = () => {
           },
           {
             headers: {
-              Authorization: 'Bearer ' + varToken,
+              genie_access_token: 'Bearer ' + varToken,
             },
           }
         )
@@ -105,6 +107,7 @@ const EditDesignationModal = () => {
       }
     },
   })
+  console.log(data)
   return (
     <div>
       <h6>Edit Designation Details</h6>

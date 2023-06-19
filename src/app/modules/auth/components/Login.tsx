@@ -50,6 +50,8 @@ export function Login() {
         // console.log(data.data.data.agentDetails)
         console.log(auth.data.jwtToken)
         localStorage.setItem('token', auth.data.jwtToken)
+        const event = new CustomEvent('handleAuth')
+        window.dispatchEvent(event)
         console.log('hrutika')
         setCurrentUser(auth.data.appAgentAccDetails)
       } catch (error) {

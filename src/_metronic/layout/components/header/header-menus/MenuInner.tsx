@@ -3,41 +3,41 @@ import {MenuItem} from './MenuItem'
 import {MenuInnerWithSub} from './MenuInnerWithSub'
 
 export function MenuInner() {
-  const intl = useIntl()
+  // const intl = useIntl()
   return (
     <>
-      <MenuItem title={intl.formatMessage({id: 'MENU.DASHBOARD'})} to='/dashboard' />
+      {/* <MenuItem title={intl.formatMessage({id: 'MENU.DASHBOARD'})} to='/dashboard' /> */}
 
-      <MenuInnerWithSub
+      {/* <MenuInnerWithSub
         title='Permissions'
         to='/crafted'
         menuPlacement='bottom-start'
         menuTrigger='click'
-      >
-        {/* PAGES */}
-        <MenuItem title='Menus' to='crafted/permissions/menus/' fontIcon='bi-archive'></MenuItem>
+      > */}
+      {/* PAGES */}
+      {/* <MenuItem title='Menus' to='crafted/permissions/menus/' fontIcon='bi-archive'></MenuItem> */}
 
-        {/* ACCOUNT */}
-        <MenuItem
+      {/* ACCOUNT */}
+      {/* <MenuItem
           title='Sub Menus'
           to='crafted/permissions/sub-menus/'
           fontIcon='bi-person'
-        ></MenuItem>
+        ></MenuItem> */}
 
-        {/* ERRORS */}
-        <MenuItem
+      {/* ERRORS */}
+      {/* <MenuItem
           title='Service Routes'
           to='crafted/permissions/service-routes/'
           fontIcon='bi-sticky'
-        ></MenuItem>
+        ></MenuItem> */}
 
-        {/* Widgets */}
-        <MenuItem
+      {/* Widgets */}
+      {/* <MenuItem
           title='Access Groups'
           to='crafted/permissions/access-groups/'
           fontIcon='bi-layers'
         ></MenuItem>
-      </MenuInnerWithSub>
+      </MenuInnerWithSub> */}
 
       <MenuInnerWithSub
         title='Employee Management'

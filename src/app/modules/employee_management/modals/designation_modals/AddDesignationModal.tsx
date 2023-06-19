@@ -1,11 +1,11 @@
 import React, {useContext} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../../../RequestConfig'
 import * as Yup from 'yup'
 import {DynamicFieldsContext} from '../../FieldsContext'
 const API_URL = process.env.REACT_APP_API_URL
-export const CREATE_Designation = `${API_URL}/agent/fields/designation/create-designation`
-export const GET_ALL_DesignationS = `${API_URL}/agent/fields/designation/get-designation`
+export const CREATE_DESIGNATION = `${API_URL}/agent/fields/designation/create-designation`
+export const GET_ALL_DESIGNATION = `${API_URL}/agent/fields/designation/get-designation`
 const DesignationValidationSchema = Yup.object().shape({
   DesignationName: Yup.string()
     .required('Designation Name is required')
@@ -15,15 +15,23 @@ const DesignationValidationSchema = Yup.object().shape({
     .matches(/^[a-zA-Z\s]+$/, 'Designation Description cannot contain numbers'),
 })
 const AddDesignationModal = () => {
-  const {DesignationmodalFunction} = useContext(DynamicFieldsContext)
+  const {DesignationmodalFunction, loadDesignationFunction} = useContext(DynamicFieldsContext)
   //load all the Designations from the backend
   async function load_Designations() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
-        GET_ALL_DesignationS,
+      const result = await api.post(
+        GET_ALL_DESIGNATION,
         {
+          appDesignationId: null,
           search: null,
+          metaData: {
+            sortBy: null,
+            sortOn: null,
+            limit: 0,
+            offset: 0,
+            fields: [],
+          },
         },
         {
           headers: {
@@ -32,8 +40,7 @@ const AddDesignationModal = () => {
         }
       )
       if (result.data.error === false) {
-        DesignationmodalFunction(false)
-        load_Designations()
+        loadDesignationFunction(result.data.data.appDesignations)
       }
     } catch (err) {
       console.log(err)
@@ -48,8 +55,8 @@ const AddDesignationModal = () => {
     onSubmit: async (values) => {
       try {
         const varToken = localStorage.getItem('token')
-        const result = await axios.post(
-          CREATE_Designation,
+        const result = await api.post(
+          CREATE_DESIGNATION,
           {
             name: values.DesignationName,
             description: values.DesignationDescription,
@@ -61,9 +68,8 @@ const AddDesignationModal = () => {
           }
         )
         console.log(result)
-        // Reset the form after successful submission
         formik.resetForm()
-        if (result.data.status === 'success') {
+        if (result.data.error === false) {
           DesignationmodalFunction(false)
           load_Designations()
         }
@@ -105,7 +111,6 @@ const AddDesignationModal = () => {
             <input
               type='text'
               className='form-control form-control-sm'
-              id='DesignationDescription'
               name='DesignationDescription'
               placeholder='Designation Description'
               onChange={formik.handleChange}

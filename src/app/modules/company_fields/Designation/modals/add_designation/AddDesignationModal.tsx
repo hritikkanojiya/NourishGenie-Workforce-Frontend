@@ -1,11 +1,11 @@
 import React, {useContext} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../../../../RequestConfig'
 import * as Yup from 'yup'
 import {DesignationContext} from '../../../context/DesignationContext'
 const API_URL = process.env.REACT_APP_API_URL
-export const CREATE_Designation = `${API_URL}/agent/fields/Designation/createAppDesignation`
-export const GET_ALL_DesignationS = `${API_URL}/agent/fields/Designation/getAppDesignation`
+export const CREATE_Designation = `${API_URL}/agent/fields/designation/create-designation`
+export const GET_ALL_DesignationS = `${API_URL}/agent/fields/designation/get-designation`
 const DesignationValidationSchema = Yup.object().shape({
   DesignationName: Yup.string()
     .required('Designation Name is required')
@@ -21,14 +21,14 @@ const AddDesignationModal = () => {
   async function load_Designations() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_DesignationS,
         {
-          search: '',
+          search: null,
         },
         {
           headers: {
-            Authorization: 'Bearer ' + varToken,
+            genie_access_token: 'Bearer ' + varToken,
           },
         }
       )
@@ -48,7 +48,7 @@ const AddDesignationModal = () => {
     onSubmit: async (values) => {
       try {
         const varToken = localStorage.getItem('token')
-        const result = await axios.post(
+        const result = await api.post(
           CREATE_Designation,
           {
             name: values.DesignationName,
@@ -56,7 +56,7 @@ const AddDesignationModal = () => {
           },
           {
             headers: {
-              Authorization: 'Bearer ' + varToken,
+              genie_access_token: 'Bearer ' + varToken,
             },
           }
         )

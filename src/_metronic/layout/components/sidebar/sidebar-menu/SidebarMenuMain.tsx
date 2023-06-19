@@ -8,19 +8,19 @@ const SidebarMenuMain = () => {
 
   return (
     <>
-      <SidebarMenuItem
+      {/* <SidebarMenuItem
         to='/dashboard'
         icon='/media/icons/duotune/art/art002.svg'
         title={intl.formatMessage({id: 'MENU.DASHBOARD'})}
         fontIcon='bi-app-indicator'
-      />
+      /> */}
 
-      <div className='menu-item'>
+      {/* <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Permissions</span>
         </div>
-      </div>
-      <SidebarMenuItem to={'crafted/permissions/menus'} title={'Menus'}></SidebarMenuItem>
+      </div> */}
+      {/* <SidebarMenuItem to={'crafted/permissions/menus'} title={'Menus'}></SidebarMenuItem>
       <SidebarMenuItem to={'crafted/permissions/sub-menus'} title={'Sub-Menus'}></SidebarMenuItem>
       <SidebarMenuItem
         to={'crafted/permissions/service-routes'}
@@ -29,7 +29,7 @@ const SidebarMenuMain = () => {
       <SidebarMenuItem
         to={'crafted/permissions/access-groups'}
         title={'Access Groups'}
-      ></SidebarMenuItem>
+      ></SidebarMenuItem> */}
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>

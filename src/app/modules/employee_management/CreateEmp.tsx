@@ -1,62 +1,99 @@
 import React, {useContext, useEffect, useState} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../RequestConfig'
 import * as Yup from 'yup'
 import dayjs, {Dayjs} from 'dayjs'
-import {DemoContainer} from '@mui/x-date-pickers/internals/demo'
 import {LocalizationProvider} from '@mui/x-date-pickers/LocalizationProvider'
 import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
 import {DatePicker} from '@mui/x-date-pickers/DatePicker'
 import {DynamicFieldsContext} from './FieldsContext'
+import {set} from 'date-fns'
 const API_URL = process.env.REACT_APP_API_URL
-export const CREATE_USER = `${API_URL}/agent/account/createAppAccount`
+export const CREATE_USER = `${API_URL}/agent/account/create-agent`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
 export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
 export const GET_ALL_ACCESS_GROUPS = `${API_URL}/permission/access-group/get-group`
 export const GET_ALL_MANAGERS = `${API_URL}/agent/fields/reporting_manager/get-manager`
+export const LOAD_COUNTRIES = `${API_URL}/countries-states-cities/get-countries`
+export const LOAD_STATE = `${API_URL}/countries-states-cities/get-states`
+export const LOAD_CITY = `${API_URL}/countries-states-cities/get-cities`
 const ProfileCard = () => {
   const profileDetailsSchema = Yup.object().shape({
-    profile_picture: Yup.mixed()
-      .test('fileFormat', 'Invalid file format', (value) => {
-        if (value && value.length > 0) {
-          const allowedFormats = ['image/jpeg', 'image/png', 'image/jpg']
-          for (let i = 0; i < value.length; i++) {
-            const file = value[i]
-            if (!allowedFormats.includes(file.type)) {
-              return false
-            }
-          }
-        }
-        return true // Allow empty field if required
-      })
-      .required('Please upload a profile picture'),
+    // profile_picture: Yup.mixed()
+    //   .test('fileFormat', 'Invalid file format', (value) => {
+    //     if (value && value.length > 0) {
+    //       const allowedFormats = ['image/jpeg', 'image/png', 'image/jpg']
+    //       for (let i = 0; i < value.length; i++) {
+    //         const file = value[i]
+    //         if (!allowedFormats.includes(file.type)) {
+    //           return false
+    //         }
+    //       }
+    //     }
+    //     return true // Allow empty field if required
+    //   })
+    //   .required('Please upload a profile picture'),
     //personal information
     first_name: Yup.string().required('First Name is required'),
     last_name: Yup.string().required('Last Name is required'),
-    email: Yup.string().required('Email is required'),
-    password: Yup.string().required('Password is required'),
+    email: Yup.string().email('Invalid email address').required('Email is required'),
+    password: Yup.string()
+      .required('Password is required')
+      .min(8, 'Password must be at least 8 characters')
+      .matches(
+        /^(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?])(?=.*[0-9])(?=.*[A-Z])/,
+        'Password must contain at least one special character, one capital letter and one number'
+      ),
     employee_type: Yup.string().required('Employee Type is required'),
     appReportingManagerId: Yup.string().required('Reporting Manager is required'),
     appDepartmentId: Yup.string().required('Department is required'),
     appDesignationId: Yup.string().required('Designation is required'),
     appAccessGroupId: Yup.string().required('Access Groups is required'),
     //work information
-    company_email: Yup.string().required('Company Email is required'),
-    primary_email: Yup.string().required('Primary Email is required'),
+    company_email: Yup.string()
+      .email('Invalid email address')
+      .required('Company Email is required'),
+    primary_email: Yup.string()
+      .email('Invalid email address')
+      .required('Primary Email is required'),
     gender: Yup.string().required('Gender is required'),
-    contact_number: Yup.string().required('Contact Number is required'),
-    date_of_birth: Yup.string().required('Date of Birth is required'),
-    date_of_joining: Yup.string().required('Date of Joining is required'),
+    contact_number: Yup.string()
+      .required('Contact Number is required')
+      .matches(/^(?!0{10}$)\d{10}$/, 'Invalid phone number'),
+    date_of_birth: Yup.date()
+      .nullable()
+      .required('Date of Birth is required')
+      .test('age', 'Age must be greater than 10', (value) => {
+        if (value) {
+          const today = new Date()
+          const birthDate = new Date(value)
+          const age = today.getFullYear() - birthDate.getFullYear()
+          const monthDiff = today.getMonth() - birthDate.getMonth()
+
+          if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+            return age - 1 > 10
+          }
+
+          return age > 10
+        }
+
+        return true
+      }),
+    date_of_joining: Yup.date().required('Date of Joining is required'),
     working_hours: Yup.string().required('Working Hours is required'),
-    salary: Yup.string().required('Salary is required'),
+    salary: Yup.number()
+      .required('Salary is required')
+      .max(5000000, 'Salary must be less than 10L'),
     marital_status: Yup.string().required('Marital Status is required'),
     //bank information
-    account_number: Yup.string().required('Account Number is required'),
+    account_number: Yup.number().required('Account Number is required'),
     name_as_per_bank: Yup.string().required('Name as per bank is required'),
     bank_name: Yup.string().required('Bank Name is required'),
     ifsc_code: Yup.string().required('IFSC Code is required'),
     //contact information
-    number: Yup.string().required('Number is required'),
+    number: Yup.string()
+      .required('Contact Number is required')
+      .matches(/^(?!0{10}$)\d{10}$/, 'Invalid phone number'),
     relation: Yup.string().required('Relation is required'),
     //address information
     country: Yup.string().required('Country is required'),
@@ -66,57 +103,57 @@ const ProfileCard = () => {
     landmark: Yup.string().required('Landmark is required'),
     pincode: Yup.string().required('Pincode is required'),
     //file information
-    aadhar_number: Yup.string().required('Aadhar Number is required'),
-    pan_number: Yup.string().required('Pan Number is required'),
-    aadhar_card: Yup.mixed()
-      .test('fileFormat', 'Only PDF files are allowed', (value) => {
-        if (value && value.length > 0) {
-          const file = value[0]
-          return file.type === 'application/pdf'
-        }
-        return true // Allow empty field if required
-      })
-      .required('Please upload a PDF file'),
-    pan_card: Yup.mixed().test('fileType', 'Only PDF files are allowed', (value) => {
-      if (!value) return true
-      const supportedFormats = ['application/pdf']
-      return supportedFormats.includes(value.type)
-    }),
-    documents: Yup.array()
-      .nullable()
-      .max(5, 'You can upload a maximum of 5 files')
-      .test('fileFormat', 'Invalid file format', (value) => {
-        if (value && value.length > 0) {
-          const allowedFormats = [
-            'application/pdf',
-            'application/msword',
-            'application/vnd.ms-powerpoint',
-            'application/vnd.ms-excel',
-            'text/csv',
-          ]
+    // aadhar_number: Yup.string().required('Aadhar Number is required'),
+    // pan_number: Yup.string().required('Pan Number is required'),
+    // aadhar_card: Yup.mixed()
+    //   .test('fileFormat', 'Only PDF files are allowed', (value) => {
+    //     if (value && value.length > 0) {
+    //       const file = value[0]
+    //       return file.type === 'application/pdf'
+    //     }
+    //     return true // Allow empty field if required
+    //   })
+    //   .required('Please upload a PDF file'),
+    // pan_card: Yup.mixed().test('fileType', 'Only PDF files are allowed', (value) => {
+    //   if (!value) return true
+    //   const supportedFormats = ['application/pdf']
+    //   return supportedFormats.includes(value.type)
+    // }),
+    // documents: Yup.array()
+    //   .nullable()
+    //   .max(5, 'You can upload a maximum of 5 files')
+    //   .test('fileFormat', 'Invalid file format', (value) => {
+    //     if (value && value.length > 0) {
+    //       const allowedFormats = [
+    //         'application/pdf',
+    //         'application/msword',
+    //         'application/vnd.ms-powerpoint',
+    //         'application/vnd.ms-excel',
+    //         'text/csv',
+    //       ]
 
-          for (let i = 0; i < value.length; i++) {
-            const file = value[i]
-            if (!allowedFormats.includes(file.type)) {
-              return false
-            }
-          }
-        }
-        return true // Allow empty field if required
-      })
-      .test('fileSize', 'File size exceeds the limit', (value) => {
-        if (value && value.length > 0) {
-          const maxSizeInBytes = 25 * 1024 * 1024 // 25 MB
+    //       for (let i = 0; i < value.length; i++) {
+    //         const file = value[i]
+    //         if (!allowedFormats.includes(file.type)) {
+    //           return false
+    //         }
+    //       }
+    //     }
+    //     return true // Allow empty field if required
+    //   })
+    //   .test('fileSize', 'File size exceeds the limit', (value) => {
+    //     if (value && value.length > 0) {
+    //       const maxSizeInBytes = 25 * 1024 * 1024 // 25 MB
 
-          for (let i = 0; i < value.length; i++) {
-            const file = value[i]
-            if (file.size > maxSizeInBytes) {
-              return false
-            }
-          }
-        }
-        return true // Allow empty field if required
-      }),
+    //       for (let i = 0; i < value.length; i++) {
+    //         const file = value[i]
+    //         if (file.size > maxSizeInBytes) {
+    //           return false
+    //         }
+    //       }
+    //     }
+    //     return true // Allow empty field if required
+    //}),
   })
   useEffect(() => {
     ;(async () => {
@@ -135,6 +172,12 @@ const ProfileCard = () => {
   const {designations} = useContext(DynamicFieldsContext)
   const {reportingManagers} = useContext(DynamicFieldsContext)
   const {accessGroups} = useContext(DynamicFieldsContext)
+  const [countries, setCountries] = useState<any[]>([])
+  const [states, setStates] = useState<any[]>([])
+  const [cities, setCities] = useState<any[]>([])
+  const [selectedCountry, setSelectedCountry] = useState<any>(null)
+  const [selectedState, setSelectedState] = useState<any>(null)
+  const [selectedCity, setSelectedCity] = useState<any>(null)
   const [date, setDate] = useState<Dayjs | null>(dayjs('2022-04-17'))
   const {DepartmentmodalFunction} = useContext(DynamicFieldsContext)
   const {DesignationmodalFunction} = useContext(DynamicFieldsContext)
@@ -146,6 +189,7 @@ const ProfileCard = () => {
     first_name: '',
     last_name: '',
     email: '',
+    password: '',
     employee_type: '',
     appReportingManagerId: '',
     appDepartmentId: '',
@@ -188,7 +232,7 @@ const ProfileCard = () => {
   async function load_reporting_managers() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_MANAGERS,
         {},
         {
@@ -207,7 +251,7 @@ const ProfileCard = () => {
   async function load_departments() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_DEPARTMENTS,
         {
           search: null,
@@ -231,10 +275,10 @@ const ProfileCard = () => {
   async function load_designations() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_DESIGNATIONS,
         {
-          search: 'Web',
+          search: null,
         },
         {
           headers: {
@@ -254,7 +298,7 @@ const ProfileCard = () => {
   async function access_groups() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_ACCESS_GROUPS,
         {
           appAccessGroupId: null,
@@ -284,13 +328,174 @@ const ProfileCard = () => {
     initialValues,
     enableReinitialize: true,
     validationSchema: profileDetailsSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       // Handle form submission logic here
-      alert('data submitted')
-      console.log(values)
       const varToken = localStorage.getItem('token')
+      try {
+        console.log({
+          //basic details
+          first_name: values.first_name,
+          last_name: values.last_name,
+          email: values.email,
+          password: values.password,
+          //personal details
+          date_of_birth: formatDate(values.date_of_birth),
+          gender: values.gender,
+          contact_number: values.contact_number,
+          marital_status: values.marital_status,
+          //work details
+          employee_type: values.employee_type,
+          appReportingManagerId: values.appReportingManagerId,
+          appDepartmentId: values.appDepartmentId,
+          appDesignationId: values.appDesignationId,
+          appAccessGroupId: values.appAccessGroupId,
+          company_email: values.company_email,
+          primary_email: values.primary_email,
+          date_of_joining: formatDate(values.date_of_joining),
+          working_hours: values.working_hours,
+          salary: values.salary,
+          //bank details
+          account_number: values.account_number,
+          name_as_per_bank: values.name_as_per_bank,
+          bank_name: values.bank_name,
+          ifsc_code: values.ifsc_code,
+          //address details
+          country: values.country,
+          state: values.state,
+          city: values.city,
+          address: values.address,
+          pincode: values.pincode,
+          landmark: values.landmark,
+          //emergency contact
+          number: values.number,
+          relation: values.relation,
+        })
+        const result = await api.post(
+          CREATE_USER,
+          {
+            //basic details
+            first_name: values.first_name,
+            last_name: values.last_name,
+            email: values.email,
+            password: values.password,
+            //personal details
+            date_of_birth: formatDate(values.date_of_birth),
+            gender: values.gender,
+            contact_number: values.contact_number,
+            marital_status: values.marital_status,
+            //work details
+            employee_type: values.employee_type,
+            appReportingManagerId: values.appReportingManagerId,
+            appDepartmentId: values.appDepartmentId,
+            appDesignationId: values.appDesignationId,
+            appAccessGroupId: values.appAccessGroupId,
+            company_email: values.company_email,
+            primary_email: values.primary_email,
+            date_of_joining: formatDate(values.date_of_joining),
+            working_hours: values.working_hours,
+            salary: values.salary,
+            //bank details
+            account_number: values.account_number,
+            name_as_per_bank: values.name_as_per_bank,
+            bank_name: values.bank_name,
+            ifsc_code: values.ifsc_code,
+            //address details
+            country: values.country,
+            state: values.state,
+            city: values.city,
+            address: values.address,
+            pincode: values.pincode,
+            landmark: values.landmark,
+            //emergency contact
+            number: values.number,
+            relation: values.relation,
+          },
+          {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          }
+        )
+        if (result.data.error === false) {
+          console.log(result.data.data)
+          alert('user created successfully')
+        }
+      } catch (err) {
+        console.log(err)
+      }
     },
   })
+
+  useEffect(() => {
+    ;(async () => {
+      const varToken = localStorage.getItem('token')
+      try {
+        const result = await api.get(LOAD_COUNTRIES, {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        })
+        console.log(result.data.data)
+        setCountries(result.data.data.counrties)
+        if (result.data.data.length !== 0) {
+          console.log('countries fetched yay')
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
+  async function load_states(country_id: any) {
+    console.log(country_id)
+    if (country_id) {
+      console.log(country_id)
+      const varToken = localStorage.getItem('token')
+      try {
+        const result = await api.post(
+          LOAD_STATE,
+          {
+            country_id: country_id,
+          },
+          {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          }
+        )
+        console.log(result.data.data)
+        setStates(result.data.data.states)
+        if (result.data.data.length !== 0) {
+          console.log('states fetched yay')
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  async function load_cities(state_id: any) {
+    if (state_id) {
+      const varToken = localStorage.getItem('token')
+      try {
+        const result = await api.post(
+          LOAD_CITY,
+          {
+            state_id: state_id,
+          },
+          {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          }
+        )
+        console.log(result.data.data)
+        setCities(result.data.data.cities)
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
   function handleDepartmentModalOpen() {
     DepartmentmodalFunction(true)
   }
@@ -303,81 +508,87 @@ const ProfileCard = () => {
   function accessGroupModalOpen() {
     AccessGroupmodalFunction(true)
   }
+  function formatDate(date: any) {
+    console.log(date)
+    const d = new Date(date['$d'])
+    // const day = d.getDate()
+    // const month = d.getMonth() + 1
+    // const year = d.getFullYear()
+    // const formattedDate = `${year}-${month}-${day}`
+    return d.toISOString()
+  }
+
   return (
     <form onSubmit={formik.handleSubmit}>
       {/* {Profile Section} */}
       <div className='card shadow' style={{width: '100%', margin: '0 auto'}}>
-        <div className='card-body' style={{display: 'flex'}}>
-          <div style={{flex: '1'}}>
+        <div className='card-body'>
+          <div>
             <h1 style={{color: 'darkorange'}} className='card-title'>
               Profile Section
             </h1>
-            <div className='form-group'>
-              <label htmlFor='profilePicture'>Profile Picture:</label>
-              <input
-                style={{marginTop: '10px', width: '60%'}}
-                type='file'
-                accept='.jpg,.png,.jpeg'
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                onChange={(event) => {
-                  formik.setFieldValue('profile_picture', event.target.files)
-                }}
-              />
-              <p style={{color: 'red', textAlign: 'left'}}>
-                (upload only in jpg, png, jpeg format)
-              </p>
-              {formik.touched.profile_picture && formik.errors.profile_picture && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.profile_picture}</div>
-                </div>
-              )}
-            </div>
           </div>
+          <div style={{display: 'flex', width: '100%'}}>
+            <div className='form-group' style={{width: '50%', marginRight: '20px'}}>
+              <div className='form-group'>
+                <label htmlFor='firstName'>First Name:</label>
+                <input
+                  type='text'
+                  style={{margin: '10px', width: '100%'}}
+                  className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                  {...formik.getFieldProps('first_name')}
+                />
+                {formik.touched.first_name && formik.errors.first_name && (
+                  <div className='fv-plugins-message-container'>
+                    <div className='fv-help-block'>{formik.errors.first_name}</div>
+                  </div>
+                )}
+              </div>
 
-          <div style={{flex: '1'}}>
-            <div className='form-group'>
-              <label htmlFor='firstName'>First Name:</label>
-              <input
-                type='text'
-                style={{margin: '10px', width: '60%'}}
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                {...formik.getFieldProps('first_name')}
-              />
-              {formik.touched.first_name && formik.errors.first_name && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.first_name}</div>
-                </div>
-              )}
+              <div className='form-group'>
+                <label htmlFor='lastName'>Last Name:</label>
+                <input
+                  type='text'
+                  style={{margin: '10px', width: '100%'}}
+                  className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                  {...formik.getFieldProps('last_name')}
+                />
+                {formik.touched.last_name && formik.errors.last_name && (
+                  <div className='fv-plugins-message-container'>
+                    <div className='fv-help-block'>{formik.errors.last_name}</div>
+                  </div>
+                )}
+              </div>
             </div>
-
-            <div className='form-group'>
-              <label htmlFor='lastName'>Last Name:</label>
-              <input
-                type='text'
-                style={{margin: '10px', width: '60%'}}
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                {...formik.getFieldProps('last_name')}
-              />
-              {formik.touched.last_name && formik.errors.last_name && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.last_name}</div>
-                </div>
-              )}
-            </div>
-
-            <div className='form-group'>
-              <label htmlFor='email'>Email:</label>
-              <input
-                type='text'
-                style={{margin: '10px', width: '60%'}}
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                {...formik.getFieldProps('email')}
-              />
-              {formik.touched.email && formik.errors.email && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.email}</div>
-                </div>
-              )}
+            <div className='form-group' style={{width: '50%'}}>
+              <div className='form-group'>
+                <label htmlFor='email'> Personal Email:</label>
+                <input
+                  type='text'
+                  style={{margin: '10px', width: '100%'}}
+                  className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                  {...formik.getFieldProps('email')}
+                />
+                {formik.touched.email && formik.errors.email && (
+                  <div className='fv-plugins-message-container'>
+                    <div className='fv-help-block'>{formik.errors.email}</div>
+                  </div>
+                )}
+              </div>
+              <div className='form-group'>
+                <label htmlFor='email'>Password:</label>
+                <input
+                  type='password'
+                  style={{margin: '10px', width: '100%'}}
+                  className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                  {...formik.getFieldProps('password')}
+                />
+                {formik.touched.password && formik.errors.password && (
+                  <div className='fv-plugins-message-container'>
+                    <div className='fv-help-block'>{formik.errors.password}</div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -440,16 +651,20 @@ const ProfileCard = () => {
               <br />
               <div className='form-group'>
                 <label htmlFor='date_of_birth'>Date of Birth:</label>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DemoContainer components={['DatePicker']}>
-                    <DatePicker value={date} onChange={(newValue) => setDate(newValue)} />
-                  </DemoContainer>
-                </LocalizationProvider>
-                {formik.touched.date_of_birth && formik.errors.date_of_birth && (
-                  <div className='fv-plugins-message-container'>
-                    <div className='fv-help-block'>{formik.errors.date_of_birth}</div>
-                  </div>
-                )}
+                <div>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      value={formik.values.date_of_birth}
+                      onChange={(newValue) => formik.setFieldValue('date_of_birth', newValue)}
+                      onAccept={() => formik.setFieldTouched('date_of_birth', true)}
+                    />
+                  </LocalizationProvider>
+                  {formik.touched.date_of_birth && formik.errors.date_of_birth && (
+                    <div className='fv-plugins-message-container'>
+                      <div className='fv-help-block'>{formik.errors.date_of_birth}</div>
+                    </div>
+                  )}
+                </div>
               </div>
               <br />
               <div className='form-group'>
@@ -565,11 +780,30 @@ const ProfileCard = () => {
               <br />
               <div className='form-group'>
                 <label htmlFor='gender'>Country:</label>
-                <input
-                  type='text'
-                  className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                  {...formik.getFieldProps('country')}
-                />
+
+                {countries.length !== 0 && (
+                  <select
+                    style={{margin: '10px', width: '100%'}}
+                    className='form-select form-select-lg form-select-solid'
+                    value={formik.values.country}
+                    onChange={(e) => {
+                      console.log('Hello')
+                      formik.setFieldValue('country', e.target.value)
+                      load_states(e.target.options[e.target.selectedIndex].dataset.countryShortId)
+                    }}
+                  >
+                    <option>Select Country</option>
+                    {countries.map((country) => (
+                      <option
+                        key={country.countryShortId}
+                        value={country._id}
+                        data-country-short-id={country.countryShortId}
+                      >
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                )}
                 {formik.touched.country && formik.errors.country && (
                   <div className='fv-plugins-message-container'>
                     <div className='fv-help-block'>{formik.errors.country}</div>
@@ -579,11 +813,26 @@ const ProfileCard = () => {
               <br />
               <div className='form-group'>
                 <label htmlFor='gender'>State:</label>
-                <input
-                  type='text'
-                  className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                  {...formik.getFieldProps('state')}
-                />
+                <select
+                  style={{margin: '10px', width: '100%'}}
+                  className='form-select form-select-lg form-select-solid'
+                  value={formik.values.state}
+                  onChange={(e) => {
+                    formik.setFieldValue('state', e.target.value)
+                    load_cities(e.target.options[e.target.selectedIndex].dataset.stateShortId)
+                  }}
+                >
+                  <option>Select State</option>
+                  {states.map((state) => (
+                    <option
+                      value={state._id}
+                      key={state.stateShortId}
+                      data-state-short-id={state.stateShortId}
+                    >
+                      {state.name}
+                    </option>
+                  ))}
+                </select>
                 {formik.touched.state && formik.errors.state && (
                   <div className='fv-plugins-message-container'>
                     <div className='fv-help-block'>{formik.errors.state}</div>
@@ -593,11 +842,21 @@ const ProfileCard = () => {
               <br />
               <div className='form-group'>
                 <label htmlFor='contact_number'>City:</label>
-                <input
-                  type='text'
-                  className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                  {...formik.getFieldProps('city')}
-                />
+                <select
+                  style={{margin: '10px', width: '100%'}}
+                  className='form-select form-select-lg form-select-solid'
+                  value={formik.values.city}
+                  onChange={(e) => {
+                    formik.setFieldValue('city', e.target.value)
+                  }}
+                >
+                  <option>Select City</option>
+                  {cities.map((city) => (
+                    <option value={city._id} key={city.cityShortId}>
+                      {city.name}
+                    </option>
+                  ))}
+                </select>
                 {formik.touched.city && formik.errors.city && (
                   <div className='fv-plugins-message-container'>
                     <div className='fv-help-block'>{formik.errors.city}</div>
@@ -722,12 +981,15 @@ const ProfileCard = () => {
                 <br />
                 {/* date of joining */}
                 <div className='form-group'>
-                  <label htmlFor='date_of_birth'>Date of Joining:</label>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DemoContainer components={['DatePicker']}>
-                      <DatePicker value={date} onChange={(newValue) => setDate(newValue)} />
-                    </DemoContainer>
-                  </LocalizationProvider>
+                  <label htmlFor='date_of_joining'>Date of Joining:</label>
+                  <div>
+                    <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <DatePicker
+                        value={formik.values.date_of_joining}
+                        onChange={(newValue) => formik.setFieldValue('date_of_joining', newValue)}
+                      />
+                    </LocalizationProvider>
+                  </div>
                   {formik.touched.date_of_joining && formik.errors.date_of_joining && (
                     <div className='fv-plugins-message-container'>
                       <div className='fv-help-block'>{formik.errors.date_of_joining}</div>
@@ -946,114 +1208,6 @@ const ProfileCard = () => {
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div style={{width: '100%'}}>
-        <div
-          className='card shadow'
-          style={{
-            marginTop: '20px',
-            padding: '20px',
-          }}
-        >
-          <div className='card-body'>
-            <div>
-              <h1 style={{color: 'darkorange'}} className='card-title'>
-                Files and Documents
-              </h1>
-              <br />
-              {/* aadhar card number */}
-            </div>
-            <div className='form-group'>
-              <label htmlFor='aadhar_number'>Aadhar Number:</label>
-              <input
-                type='text'
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                {...formik.getFieldProps('aadhar_number')}
-              />
-              {formik.touched.aadhar_number && formik.errors.aadhar_number && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.aadhar_number}</div>
-                </div>
-              )}
-            </div>
-            <br />
-            {/* aadhar card file */}
-            <div className='form-group'>
-              <label htmlFor='aadhar_number'>Aadhar File:</label>
-              <input
-                type='file'
-                accept='.pdf'
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                onChange={(event) => {
-                  formik.setFieldValue('aadhar_card', event.target.files)
-                }}
-              />
-              <p style={{color: 'red', textAlign: 'right'}}>(upload only in PDF format)</p>
-              {formik.touched.aadhar_card && formik.errors.aadhar_card && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.aadhar_card}</div>
-                </div>
-              )}
-            </div>
-            <br />
-            {/* Pan number  */}
-            <div className='form-group'>
-              <label htmlFor='aadhar_number'>Pan Number:</label>
-              <input
-                type='text'
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                {...formik.getFieldProps('pan_number')}
-              />
-              {formik.touched.pan_number && formik.errors.pan_number && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.pan_number}</div>
-                </div>
-              )}
-            </div>
-            <br />
-            {/* Pan card file */}
-            <div className='form-group'>
-              {/* <label htmlFor='aadhar_number'>Pan File:</label> */}
-              <label htmlFor='pan_card'>Pan File:</label>
-              <input
-                type='file'
-                accept='.pdf'
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                onChange={(event) => {
-                  formik.setFieldValue('aadhar_card', event.target.files)
-                }}
-              />
-              <p style={{color: 'red', textAlign: 'right'}}>(upload only in PDF format)</p>
-              {formik.touched.aadhar_card && formik.errors.aadhar_card && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.aadhar_card}</div>
-                </div>
-              )}
-            </div>
-            <br />
-            {/* Documents */}
-            <div className='form-group'>
-              <label htmlFor='aadhar_number'>Documents:</label>
-              <input
-                type='file'
-                multiple
-                name='documents'
-                className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                onChange={(event) => {
-                  formik.setFieldValue('documents', event.target.files)
-                }}
-              />
-              <p style={{color: 'red', textAlign: 'right'}}>
-                (upload maximum 5 files at a time with size within 25mb)
-              </p>
-              {formik.touched.documents && formik.errors.documents && (
-                <div className='fv-plugins-message-container'>
-                  <div className='fv-help-block'>{formik.errors.documents}</div>
-                </div>
-              )}
             </div>
           </div>
         </div>

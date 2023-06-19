@@ -1,6 +1,6 @@
 import React, {useContext} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../../../RequestConfig'
 import * as Yup from 'yup'
 import {DynamicFieldsContext} from '../../FieldsContext'
 const API_URL = process.env.REACT_APP_API_URL
@@ -21,7 +21,7 @@ const AddDepartmentModal = () => {
   async function load_departments() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_DEPARTMENTS,
         {
           search: null,
@@ -48,7 +48,7 @@ const AddDepartmentModal = () => {
     onSubmit: async (values) => {
       try {
         const varToken = localStorage.getItem('token')
-        const result = await axios.post(
+        const result = await api.post(
           CREATE_DEPARTMENT,
           {
             name: values.departmentName,

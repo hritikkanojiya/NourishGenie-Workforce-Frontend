@@ -8,11 +8,15 @@ import {
   Dispatch,
   SetStateAction,
 } from 'react'
+
 import {LayoutSplashScreen} from '../../../../_metronic/layout/core'
 import {AuthModel, UserModel} from './_models'
 import * as authHelper from './AuthHelpers'
 import {getUserByToken} from './_requests'
 import {WithChildren} from '../../../../_metronic/helpers'
+import axios from 'axios'
+const API_URL = process.env.REACT_APP_API_URL
+export const LOGOUT_URL = `${API_URL}/agent/auth/logout`
 
 type AuthContextProps = {
   auth: AuthModel | undefined
@@ -48,9 +52,30 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
     }
   }
 
-  const logout = () => {
-    saveAuth(undefined)
-    setCurrentUser(undefined)
+  const logout = async () => {
+    //call the logout api
+    const URL = LOGOUT_URL
+    const varToken = localStorage.getItem('token')
+    try {
+      const result = await axios.post(
+        URL,
+        {},
+        {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        }
+      )
+      console.log(result)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      saveAuth(undefined)
+      setCurrentUser(undefined)
+      localStorage.removeItem('token')
+      const event = new CustomEvent('handleAuth')
+      window.dispatchEvent(event)
+    }
   }
 
   return (
@@ -62,6 +87,7 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
 
 const AuthInit: FC<WithChildren> = ({children}) => {
   const {auth, logout, setCurrentUser} = useAuth()
+
   const didRequest = useRef(false)
   const [showSplashScreen, setShowSplashScreen] = useState(true)
   // We should request user by authToken (IN OUR EXAMPLE IT'S API_TOKEN) before rendering the application

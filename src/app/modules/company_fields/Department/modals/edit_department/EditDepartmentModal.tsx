@@ -1,6 +1,6 @@
 import React, {useContext, useEffect} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../../../../RequestConfig'
 import * as Yup from 'yup'
 import {DepartmentContext} from '../../../context/DepartmentContext'
 const API_URL = process.env.REACT_APP_API_URL
@@ -34,7 +34,7 @@ const EditDepartmentModal = () => {
   async function load_departments() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_DEPARTMENTS,
         {
           search: null,
@@ -55,7 +55,7 @@ const EditDepartmentModal = () => {
   async function load_details() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_DETAILS,
         {
           appDepartmentId: departmentId,
@@ -83,7 +83,7 @@ const EditDepartmentModal = () => {
     onSubmit: async (values) => {
       try {
         const varToken = localStorage.getItem('token')
-        const result = await axios.patch(
+        const result = await api.put(
           UPDATE_DEPARTMENT,
           {
             appDepartmentId: departmentId,

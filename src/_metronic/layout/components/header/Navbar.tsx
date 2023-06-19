@@ -2,6 +2,7 @@ import clsx from 'clsx'
 import {KTSVG, toAbsoluteUrl} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
+import {useAuth} from '../../../../app/modules/auth'
 
 const itemClass = 'ms-1 ms-lg-3'
 const btnClass =
@@ -11,9 +12,13 @@ const btnIconClass = 'svg-icon-1'
 
 const Navbar = () => {
   const {config} = useLayout()
+  const {currentUser} = useAuth()
+
+  const first_name = currentUser?.username.split(' ')[0]
+  const last_name = currentUser?.username.split(' ')[1]
   return (
     <div className='app-navbar flex-shrink-0'>
-      <div className={clsx('app-navbar-item align-items-stretch', itemClass)}>
+      {/* <div className={clsx('app-navbar-item align-items-stretch', itemClass)}>
         <Search />
       </div>
 
@@ -40,7 +45,7 @@ const Navbar = () => {
           <KTSVG path='/media/icons/duotune/communication/com012.svg' className={btnIconClass} />
           <span className='bullet bullet-dot bg-success h-6px w-6px position-absolute translate-middle top-0 start-50 animation-blink' />
         </div>
-      </div>
+      </div> */}
 
       <div className={clsx('app-navbar-item', itemClass)}>
         <ThemeModeSwitcher toggleBtnClass={clsx('btn-active-light-primary btn-custom')} />
@@ -53,7 +58,7 @@ const Navbar = () => {
           data-kt-menu-attach='parent'
           data-kt-menu-placement='bottom-end'
         >
-          <img src={toAbsoluteUrl('/media/avatars/300-1.jpg')} alt='' />
+          <img src={`https://ui-avatars.com/api/?name=${first_name}+${last_name}`} alt='' />
         </div>
         <HeaderUserMenu />
       </div>

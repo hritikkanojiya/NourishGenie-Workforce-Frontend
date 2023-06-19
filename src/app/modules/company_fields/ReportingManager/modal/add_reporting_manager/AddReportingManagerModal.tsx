@@ -1,6 +1,6 @@
 import React, {useContext, useEffect} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../../../../RequestConfig'
 import {ReportingManagerContext} from '../../../context/ReportingManagerContext'
 const API_URL = process.env.REACT_APP_API_URL
 export const GET_ALL_MANAGERS = `${API_URL}/agent/fields/reporting_manager/get-manager`
@@ -18,7 +18,7 @@ const AddReportingManagerModal = () => {
   async function load_managers() {
     const varToken = localStorage.getItem('token')
     try {
-      const result: any = await axios.post(
+      const result: any = await api.post(
         GET_ALL_MANAGERS,
         {},
         {
@@ -42,7 +42,7 @@ const AddReportingManagerModal = () => {
       try {
         console.log(values.managerId)
         const varToken = localStorage.getItem('token')
-        const result = await axios.post(
+        const result = await api.post(
           CREATE_REPORTING_MANAGER,
           {
             appAgentId: values.managerId,
@@ -68,7 +68,7 @@ const AddReportingManagerModal = () => {
   async function get_non_managers() {
     const varToken = localStorage.getItem('token')
     try {
-      const result: any = await axios.get(GET_NON_MANAGER_EMPLOYEES, {
+      const result: any = await api.get(GET_NON_MANAGER_EMPLOYEES, {
         headers: {
           genie_access_token: 'Bearer ' + varToken,
         },

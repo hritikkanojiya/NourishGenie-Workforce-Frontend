@@ -22,6 +22,8 @@ const EmployeeCard: FC<Props> = ({
   DeleteSingleUser,
   id,
 }) => {
+  const first_name = name.split(' ')[0]
+  const last_name = name.split(' ')[1]
   return (
     <div className='card'>
       <div className='card-body d-flex flex-center flex-column p-9'>
@@ -37,7 +39,7 @@ const EmployeeCard: FC<Props> = ({
                 {name.charAt(0)}
               </span>
             ) : (
-              <img alt='Pic' src={toAbsoluteUrl(avatar)} />
+              <img alt='Pic' src={`https://ui-avatars.com/api/?name=${first_name}+${last_name}`} />
             )}
             {online && (
               <div className='symbol-badge bg-success start-100 top-100 border-4 h-15px w-15px ms-n3 mt-n3'></div>
@@ -80,7 +82,7 @@ const EmployeeCard: FC<Props> = ({
               style={{
                 background: 'transparent',
                 border: '1px solid red',
-                color: 'white',
+                color: 'black',
               }}
             >
               Delete

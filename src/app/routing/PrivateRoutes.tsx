@@ -24,7 +24,7 @@ const PrivateRoutes = () => {
   const EditEmployeeDetails = lazy(
     () => import('../modules/employee_management/EditEmployeeDetails')
   )
-  const CreateEmployee = lazy(() => import('../modules/employee_management/CreateEmployee'))
+  //const CreateEmployee = lazy(() => import('../modules/employee_management/CreateEmployee'))
   //company fields route
   const DepartmentActions = lazy(
     () => import('../modules/company_fields/Department/DepartmentActions')
@@ -36,15 +36,18 @@ const PrivateRoutes = () => {
     () => import('../modules/company_fields/ReportingManager/ReportingManagerActions')
   )
   const CreateActions = lazy(() => import('../modules/employee_management/CreateActions'))
-  const CompanyEmp = lazy(() => import('../modules/employee_management/CreateEmp'))
+  //const CompanyEmp = lazy(() => import('../modules/employee_management/CreateEmp'))
 
   return (
     <Routes>
       <Route element={<MasterLayout />}>
         {/* Redirect to Dashboard after success login/registartion */}
-        <Route path='auth/*' element={<Navigate to='/dashboard' />} />
+        <Route
+          path='auth/*'
+          element={<Navigate to='/crafted/employee_management/company-employees' />}
+        />
         {/* Pages */}
-        <Route path='dashboard' element={<DashboardWrapper />} />
+        {/* <Route path='dashboard' element={<DashboardWrapper />} /> */}
         <Route path='builder' element={<BuilderPageWrapper />} />
         <Route path='menu-test' element={<MenuTestPage />} />
         {/* Lazy Modules */}
@@ -100,9 +103,11 @@ const PrivateRoutes = () => {
         <Route
           path='crafted/employee_management/create-employee/*'
           element={
-            <SuspensedView>
-              <CreateEmployee />
-            </SuspensedView>
+            <DynamicFieldsContextProvider>
+              <SuspensedView>
+                <CreateActions />
+              </SuspensedView>
+            </DynamicFieldsContextProvider>
           }
         />
         <Route

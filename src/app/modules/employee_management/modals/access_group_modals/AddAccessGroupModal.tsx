@@ -1,11 +1,11 @@
 import React, {useContext} from 'react'
 import {useFormik} from 'formik'
-import axios from 'axios'
+import api from '../../../RequestConfig'
 import * as Yup from 'yup'
 import {DynamicFieldsContext} from '../../FieldsContext'
 const API_URL = process.env.REACT_APP_API_URL
-export const CREATE_ACCESS_GROUP = `${API_URL}/agent/fields/accessGroup/create-group`
-export const GET_ALL_ACCESSGROUP = `${API_URL}/agent/fields/accessGroup/get-group`
+export const CREATE_ACCESS_GROUP = `${API_URL}/permission/access-group/create-group`
+export const GET_ALL_ACCESSGROUP = `${API_URL}/permission/access-group/get-group`
 const accessGroupValidationSchema = Yup.object().shape({
   accessGroupName: Yup.string()
     .required('Department Name is required')
@@ -15,12 +15,12 @@ const accessGroupValidationSchema = Yup.object().shape({
     .matches(/^[a-zA-Z\s]+$/, 'Department Description cannot contain numbers'),
 })
 const AddDepartmentModal = () => {
-  const {AccessGroupmodalFunction} = useContext(DynamicFieldsContext)
+  const {AccessGroupmodalFunction, loadAccessGroupFunction} = useContext(DynamicFieldsContext)
   //load all the accessGroups from the backend
   async function load_accessGroups() {
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
+      const result = await api.post(
         GET_ALL_ACCESSGROUP,
         {
           search: null,
@@ -32,6 +32,7 @@ const AddDepartmentModal = () => {
         }
       )
       if (result.data.error === false) {
+        loadAccessGroupFunction(result.data.data.appAccessGroups)
       }
     } catch (err) {
       console.log(err)
@@ -46,7 +47,7 @@ const AddDepartmentModal = () => {
     onSubmit: async (values) => {
       try {
         const varToken = localStorage.getItem('token')
-        const result = await axios.post(
+        const result = await api.post(
           CREATE_ACCESS_GROUP,
           {
             name: values.accessGroupName,
