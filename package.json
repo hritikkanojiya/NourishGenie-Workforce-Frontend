@@ -1,8 +1,7 @@
 {
-  "name": "demo1",
-  "version": "8.1.7",
-  "private": true,
-  "homepage": "/metronic8/react/demo1",
+  "name": "workforce_frontend",
+  "version": "1.0.0",
+  "homepage": "/",
   "dependencies": {
     "@date-io/date-fns": "^2.16.0",
     "@emotion/react": "^11.11.1",
