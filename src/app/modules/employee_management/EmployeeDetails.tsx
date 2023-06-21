@@ -4,7 +4,7 @@ import {useLocation} from 'react-router-dom'
 import {Spinner} from 'react-bootstrap'
 import api from '../RequestConfig'
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_USER_DETAILS = `${API_URL}/agent/account/get-all-details`
+export const GET_USER_DETAILS = `${API_URL}/agent/account/get-agent-details`
 function EmployeeDetails() {
   const location: any = useLocation()
   const [details, setDetails] = React.useState<any>({})
@@ -28,7 +28,9 @@ function EmployeeDetails() {
   async function load_details(id: any) {
     setIsLoading(true)
     const varToken = localStorage.getItem('token')
+
     try {
+      console.log(id)
       const result = await api.post(
         GET_USER_DETAILS,
         {

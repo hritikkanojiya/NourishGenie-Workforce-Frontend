@@ -24,6 +24,7 @@ const EmployeeCard: FC<Props> = ({
 }) => {
   const first_name = name.split(' ')[0]
   const last_name = name.split(' ')[1]
+  console.log(id)
   return (
     <div className='card'>
       <div className='card-body d-flex flex-center flex-column p-9'>

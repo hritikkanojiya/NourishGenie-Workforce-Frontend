@@ -25,15 +25,19 @@ const API_URL = process.env.REACT_APP_API_URL
 export const GET_ALL_USERS = `${API_URL}/agent/account/get-agents`
 export const DELETE_SINGLE_USER = `${API_URL}/agent/account/delete-agent`
 export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
+export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
 function CompanyEmployees() {
   const [employees, setEmployees] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [appDesignationId, setAppDesignationId] = React.useState<string | null>(null)
+  const [appDepartmentId, setAppDepartmentId] = React.useState<string | null>(null)
   const [designations, setDesignations] = React.useState([])
+  const [departments, setDepartments] = React.useState([])
   //api calling
   useEffect(() => {
     ;(async () => {
       await load_Designations()
+      await load_Departments()
     })()
   }, [])
 
@@ -41,7 +45,7 @@ function CompanyEmployees() {
     ;(async () => {
       await Load()
     })()
-  }, [appDesignationId])
+  }, [appDesignationId, appDepartmentId])
   async function Load(parameter?: any) {
     setIsLoading(true)
     const varToken = localStorage.getItem('token')
@@ -50,6 +54,7 @@ function CompanyEmployees() {
       GET_ALL_USERS,
       {
         appDesignationId: appDesignationId,
+        appDepartmentId: appDepartmentId,
       },
       {
         headers: {
@@ -106,6 +111,32 @@ function CompanyEmployees() {
       setIsLoading(false)
     }
   }
+  async function load_Departments() {
+    setIsLoading(true)
+    const varToken = localStorage.getItem('token')
+    try {
+      const result = await api.post(
+        GET_ALL_DEPARTMENTS,
+        {
+          search: null,
+          metaData: {
+            limit: 0,
+          },
+        },
+        {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        }
+      )
+      setDepartments(result.data.data.AppDepartment)
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   // async function DeleteMultipleUser(id: any) {
   //   //LOOP through the array and delete the user
   //   const varToken = localStorage.getItem('token')
@@ -120,12 +151,12 @@ function CompanyEmployees() {
   // }
   const employeeCards = employees.map((employee: any) => {
     return (
-      <div key={employee._id} className='col-md-6 col-xxl-4'>
+      <div key={employee.appAgentId} className='col-md-6 col-xxl-4'>
         <EmployeeCard
           avatar='/media/avatars/300-25.jpg'
           name={employee.first_name + ' ' + employee.last_name}
           employeeType={employee.employee_type}
-          id={employee._id}
+          id={employee.appAgentId}
           DeleteSingleUser={DeleteSingleUser}
         />
       </div>
@@ -136,30 +167,30 @@ function CompanyEmployees() {
       <PageTitle breadcrumbs={permissionsBreadCrumbs}>Company Employees</PageTitle>
 
       <div className='d-flex flex-wrap flex-stack mb-6'>
-        <div className='d-flex my-2'>
-          <select
-            name='status'
-            data-control='select2'
-            data-hide-search='true'
-            className='form-select form-select-white form-select-sm w-125px'
-            defaultValue='Online'
-          >
-            <option value='Online'>Online</option>
-            <option value='Pending'>Pending</option>
-            <option value='Declined'>Declined</option>
-            <option value='Accepted'>Accepted</option>
-          </select>
-        </div>
         <select
-          style={{margin: '10px', width: '80%'}}
+          style={{margin: '10px', width: '50%'}}
           className='form-select form-select-lg form-select-solid'
           onChange={(e) => {
-            setAppDesignationId(e.target.value)
+            setAppDesignationId(e.target.value !== 'null' ? e.target.value : null)
           }}
         >
-          <option value=''>Select Designation</option>
+          <option value={'null'}>Filter Employees Designation</option>
           {designations.map((dn: any) => (
             <option key={dn.appDesignationId} value={dn.appDesignationId}>
+              {dn.name}
+            </option>
+          ))}
+        </select>
+        <select
+          style={{margin: '10px', width: '50%'}}
+          className='form-select form-select-lg form-select-solid'
+          onChange={(e) => {
+            setAppDepartmentId(e.target.value !== 'null' ? e.target.value : null)
+          }}
+        >
+          <option value={'null'}>Filter Employees Department</option>
+          {departments.map((dn: any) => (
+            <option key={dn.appDepartmentId} value={dn.appDepartmentId}>
               {dn.name}
             </option>
           ))}
@@ -179,11 +210,19 @@ function CompanyEmployees() {
         </div>
       ) : (
         <>
-          <div className='row g-6 g-xl-9'>{employeeCards}</div>
+          {employees ? (
+            <>
+              <div className='row g-6 g-xl-9'>{employeeCards}</div>
 
-          <div className='d-flex flex-stack flex-wrap pt-10'>
-            <div className='fs-6 fw-bold text-gray-700'>Showing 1 to 10 of 50 entries</div>
-          </div>
+              <div className='d-flex flex-stack flex-wrap pt-10'>
+                <div className='fs-6 fw-bold text-gray-700'>Showing 1 to 10 of 50 entries</div>
+              </div>
+            </>
+          ) : (
+            <div className='d-flex align-items-center justify-content-center loader-container'>
+              <h1>No Employees Found</h1>
+            </div>
+          )}
         </>
       )}
     </>

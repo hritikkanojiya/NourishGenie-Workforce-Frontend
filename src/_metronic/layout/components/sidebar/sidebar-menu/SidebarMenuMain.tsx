@@ -33,7 +33,7 @@ const SidebarMenuMain = () => {
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
           <span className='menu-section text-muted text-uppercase fs-8 ls-1'>
-            Employee Management
+            <b>Employee Management</b>
           </span>
         </div>
       </div>
@@ -43,7 +43,12 @@ const SidebarMenuMain = () => {
       ></SidebarMenuItem>
       <div className='menu-item'>
         <div className='menu-content pt-8 pb-2'>
-          <span className='menu-section text-muted text-uppercase fs-8 ls-1'>Company Fields</span>
+          <span
+            style={{fontSize: 'bold'}}
+            className='menu-section text-muted text-uppercase fs-8 ls-1'
+          >
+            Company Fields
+          </span>
         </div>
       </div>
       <SidebarMenuItem

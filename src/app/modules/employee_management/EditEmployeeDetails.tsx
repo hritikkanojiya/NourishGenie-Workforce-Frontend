@@ -25,11 +25,14 @@ const permissionsBreadCrumbs: Array<PageLink> = [
 ]
 const API_URL = process.env.REACT_APP_API_URL
 export const GET_USER_UPDATE_DETAILS = `${API_URL}/agent/account/update-agents`
-export const GET_USER_DETAILS = `${API_URL}/agent/account/get-all-details`
+export const GET_USER_DETAILS = `${API_URL}/agent/account/get-agent-details`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
 export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
 export const GET_ALL_ACCESS_GROUPS = `${API_URL}/permission/access-group/get-group`
 export const GET_ALL_MANAGERS = `${API_URL}/agent/fields/reporting_manager/get-manager`
+export const LOAD_COUNTRIES = `${API_URL}/countries-states-cities/get-countries`
+export const LOAD_STATE = `${API_URL}/countries-states-cities/get-states`
+export const LOAD_CITY = `${API_URL}/countries-states-cities/get-cities`
 
 const profileDetailsSchema = Yup.object().shape({
   //personal information
@@ -37,7 +40,7 @@ const profileDetailsSchema = Yup.object().shape({
   last_name: Yup.string().required('Last Name is required'),
   email: Yup.string().email('Invalid email address').required('Email is required'),
   employee_type: Yup.string().required('Employee Type is required'),
-  appReportingManagerId: Yup.string().required('Reporting Manager is required'),
+  appReportingManagerId: Yup.string(),
   appDepartmentId: Yup.string().required('Department is required'),
   appDesignationId: Yup.string().required('Designation is required'),
   appAccessGroupId: Yup.string().required('Access Groups is required'),
@@ -98,6 +101,9 @@ const EditEmployeeDetails: React.FC = () => {
   const [accessGroup, setAccessGroup] = useState<any>([])
   const [managers, setManagers] = useState<any>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [countries, setCountries] = useState<any[]>([])
+  const [states, setStates] = useState<any[]>([])
+  const [cities, setCities] = useState<any[]>([])
 
   //load details of a single employee
   useEffect(() => {
@@ -127,6 +133,8 @@ const EditEmployeeDetails: React.FC = () => {
         }
       )
       setData(result.data.data)
+      load_states(result.data.data.address_details.country.countryShortId)
+      load_cities(result.data.data.address_details.state.stateShortId)
       if (result.data.error === false) {
       }
     } catch (err) {
@@ -310,9 +318,9 @@ const EditEmployeeDetails: React.FC = () => {
     bank_name: data && data.bank_details.bank_name ? data.bank_details.bank_name : '',
     ifsc_code: data && data.bank_details.ifsc_code ? data.bank_details.ifsc_code : '',
     //address information
-    country: data && data.address_details.country ? data.address_details.country : '',
-    state: data && data.address_details.state ? data.address_details.state : '',
-    city: data && data.address_details.city ? data.address_details.city : '',
+    country: data && data.address_details.country ? data.address_details.country._id : '',
+    state: data && data.address_details.state ? data.address_details.state._id : '',
+    city: data && data.address_details.city ? data.address_details.city._id : '',
     address: data && data.address_details.address ? data.address_details.address : '',
     landmark: data && data.address_details.landmark ? data.address_details.landmark : '',
     pincode: data && data.address_details.pincode ? data.address_details.pincode : '',
@@ -329,6 +337,77 @@ const EditEmployeeDetails: React.FC = () => {
     // const year = d.getFullYear()
     // const formattedDate = `${year}-${month}-${day}`
     return d.toISOString()
+  }
+
+  useEffect(() => {
+    ;(async () => {
+      const varToken = localStorage.getItem('token')
+      try {
+        const result = await api.get(LOAD_COUNTRIES, {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        })
+        console.log(result.data.data)
+        setCountries(result.data.data.counrties)
+        if (result.data.data.length !== 0) {
+          console.log('countries fetched yay')
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    })()
+  }, [])
+
+  async function load_states(country_id: any) {
+    console.log(country_id)
+    if (country_id) {
+      console.log(country_id)
+      const varToken = localStorage.getItem('token')
+      try {
+        const result = await api.post(
+          LOAD_STATE,
+          {
+            country_id: country_id,
+          },
+          {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          }
+        )
+        console.log(result.data.data)
+        setStates(result.data.data.states)
+        if (result.data.data.length !== 0) {
+          console.log('states fetched yay')
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
+
+  async function load_cities(state_id: any) {
+    if (state_id) {
+      const varToken = localStorage.getItem('token')
+      try {
+        const result = await api.post(
+          LOAD_CITY,
+          {
+            state_id: state_id,
+          },
+          {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          }
+        )
+        console.log(result.data.data)
+        setCities(result.data.data.cities)
+      } catch (error) {
+        console.log(error)
+      }
+    }
   }
 
   const formik: any = useFormik({
@@ -352,7 +431,9 @@ const EditEmployeeDetails: React.FC = () => {
             last_name: values.last_name,
             email: values.email,
             employee_type: values.employee_type,
-            appReportingManagerId: values.appReportingManagerId,
+            appReportingManagerId: values.appReportingManagerId
+              ? values.appReportingManagerId
+              : null,
             appDepartmentId: values.appDepartmentId,
             appDesignationId: values.appDesignationId,
             appAccessGroupId: values.appAccessGroupId,
@@ -657,11 +738,31 @@ const EditEmployeeDetails: React.FC = () => {
                     <br />
                     <div className='form-group'>
                       <label htmlFor='gender'>Country:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('country')}
-                      />
+                      {countries.length !== 0 && (
+                        <select
+                          style={{margin: '10px', width: '100%'}}
+                          className='form-select form-select-lg form-select-solid'
+                          value={formik.values.country}
+                          onChange={(e) => {
+                            console.log('Hello')
+                            formik.setFieldValue('country', e.target.value)
+                            load_states(
+                              e.target.options[e.target.selectedIndex].dataset.countryShortId
+                            )
+                          }}
+                        >
+                          <option>Select Country</option>
+                          {countries.map((country) => (
+                            <option
+                              key={country.countryShortId}
+                              value={country._id}
+                              data-country-short-id={country.countryShortId}
+                            >
+                              {country.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                       {formik.touched.country && formik.errors.country && (
                         <div className='fv-plugins-message-container'>
                           <div className='fv-help-block'>{formik.errors.country}</div>
@@ -671,11 +772,26 @@ const EditEmployeeDetails: React.FC = () => {
                     <br />
                     <div className='form-group'>
                       <label htmlFor='gender'>State:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('state')}
-                      />
+                      <select
+                        style={{margin: '10px', width: '100%'}}
+                        className='form-select form-select-lg form-select-solid'
+                        value={formik.values.state}
+                        onChange={(e) => {
+                          formik.setFieldValue('state', e.target.value)
+                          load_cities(e.target.options[e.target.selectedIndex].dataset.stateShortId)
+                        }}
+                      >
+                        <option>Select State</option>
+                        {states.map((state) => (
+                          <option
+                            value={state._id}
+                            key={state.stateShortId}
+                            data-state-short-id={state.stateShortId}
+                          >
+                            {state.name}
+                          </option>
+                        ))}
+                      </select>
                       {formik.touched.state && formik.errors.state && (
                         <div className='fv-plugins-message-container'>
                           <div className='fv-help-block'>{formik.errors.state}</div>
@@ -685,11 +801,21 @@ const EditEmployeeDetails: React.FC = () => {
                     <br />
                     <div className='form-group'>
                       <label htmlFor='contact_number'>City:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('city')}
-                      />
+                      <select
+                        style={{margin: '10px', width: '100%'}}
+                        className='form-select form-select-lg form-select-solid'
+                        value={formik.values.city}
+                        onChange={(e) => {
+                          formik.setFieldValue('city', e.target.value)
+                        }}
+                      >
+                        <option>Select City</option>
+                        {cities.map((city) => (
+                          <option value={city._id} key={city.cityShortId}>
+                            {city.name}
+                          </option>
+                        ))}
+                      </select>
                       {formik.touched.city && formik.errors.city && (
                         <div className='fv-plugins-message-container'>
                           <div className='fv-help-block'>{formik.errors.city}</div>
@@ -1021,14 +1147,6 @@ const EditEmployeeDetails: React.FC = () => {
             </div>
             <button type='submit' className='btn btn-primary'>
               Save Changes
-            </button>
-            <button
-              type='button'
-              onClick={() => {
-                console.log(formik.errors)
-              }}
-            >
-              Check
             </button>
           </form>
         </div>
