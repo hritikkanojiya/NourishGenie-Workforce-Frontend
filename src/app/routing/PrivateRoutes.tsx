@@ -11,6 +11,7 @@ import DepartmentContextProvider from '../modules/company_fields/context/Departm
 import DesignaitonContextProvider from '../modules/company_fields/context/DesignationContext'
 import ReportingManagerContextProvider from '../modules/company_fields/context/ReportingManagerContext'
 import DynamicFieldsContextProvider from '../modules/employee_management/FieldsContext'
+import FilesContextProvider from '../modules/employee_management/FilesContext'
 
 const PrivateRoutes = () => {
   //permission routes
@@ -36,7 +37,7 @@ const PrivateRoutes = () => {
     () => import('../modules/company_fields/ReportingManager/ReportingManagerActions')
   )
   const CreateActions = lazy(() => import('../modules/employee_management/CreateActions'))
-  //const CompanyEmp = lazy(() => import('../modules/employee_management/CreateEmp'))
+  const FileActions = lazy(() => import('../modules/employee_management/FileActions'))
 
   return (
     <Routes>
@@ -108,6 +109,16 @@ const PrivateRoutes = () => {
                 <CreateActions />
               </SuspensedView>
             </DynamicFieldsContextProvider>
+          }
+        />
+        <Route
+          path='crafted/employee_management/employee-files/*'
+          element={
+            <FilesContextProvider>
+              <SuspensedView>
+                <FileActions />
+              </SuspensedView>
+            </FilesContextProvider>
           }
         />
         <Route

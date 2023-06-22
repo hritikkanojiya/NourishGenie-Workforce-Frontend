@@ -24,7 +24,7 @@ const permissionsBreadCrumbs: Array<PageLink> = [
   },
 ]
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_USER_UPDATE_DETAILS = `${API_URL}/agent/account/update-agents`
+export const GET_USER_UPDATE_DETAILS = `${API_URL}/agent/account/update-agent`
 export const GET_USER_DETAILS = `${API_URL}/agent/account/get-agent-details`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
 export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`

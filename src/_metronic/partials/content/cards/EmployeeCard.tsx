@@ -65,7 +65,7 @@ const EmployeeCard: FC<Props> = ({
               className='btn btn-success btn-sm'
               style={{
                 border: '1px solid green',
-                color: 'white',
+                color: 'black',
                 background: 'transparent',
               }}
             >
@@ -74,6 +74,22 @@ const EmployeeCard: FC<Props> = ({
               </Link>
             </button>
           </div>
+
+          <div style={{marginRight: '10px'}}>
+            <button
+              className='btn btn-primary btn-sm'
+              style={{
+                border: '1px solid blue',
+                color: 'black',
+                background: 'transparent',
+              }}
+            >
+              <Link to={'/crafted/employee_management/employee-files'} state={id}>
+                Files
+              </Link>
+            </button>
+          </div>
+
           <div>
             <button
               onClick={() => {
