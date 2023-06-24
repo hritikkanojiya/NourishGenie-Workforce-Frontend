@@ -19,23 +19,52 @@ const validationSchema = Yup.object().shape({
   aadharCardFile: Yup.mixed().required('Aadhar card file is required'),
   panCardFile: Yup.mixed().required('PAN card file is required'),
   profilePicture: Yup.mixed().required('Profile picture is required'),
-  otherFiles: Yup.array().of(
-    Yup.mixed().test(
-      'fileType',
-      'Invalid file type',
-      (value) =>
-        value &&
-        [
+  otherFiles: Yup.array()
+    .nullable()
+    .max(5, 'You can upload a maximum of 5 files')
+    .test('fileFormat', 'Invalid file format', (value) => {
+      if (value && value.length > 0) {
+        const allowedFormats = [
           'application/pdf',
+          'application/msword',
           'application/vnd.ms-powerpoint',
-          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-excel',
           'text/csv',
-          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        ].includes(value.type)
-    )
-  ),
+        ]
+
+        for (let i = 0; i < value.length; i++) {
+          const file = value[i]
+          if (!allowedFormats.includes(file.type)) {
+            return false
+          }
+        }
+      }
+      return true // Allow empty field if required
+    })
+    .test('fileSize', 'File size exceeds the limit', (value) => {
+      if (value && value.length > 0) {
+        const maxSizeInBytes = 25 * 1024 * 1024 // 25 MB
+
+        for (let i = 0; i < value.length; i++) {
+          const file = value[i]
+          if (file.size > maxSizeInBytes) {
+            return false
+          }
+        }
+      }
+      return true // Allow empty field if required
+    }),
 })
+
+//interface
+// interface FormValues {
+//   aadharNumber: string
+//   panNumber: string
+//   aadharCardFile: File | null
+//   panCardFile: File | null
+//   profilePicture: File | null
+//   otherFiles: File[]
+// }
 
 const UploadFileModal = () => {
   const location = useLocation()
@@ -44,41 +73,6 @@ const UploadFileModal = () => {
   const [aadharFile, setAadharFile] = useState<any>([])
   const [panFile, setPanFile] = useState<any>([])
   const [documentFiles, setDocumentFiles] = useState<any>([])
-
-  // Handlers for files change
-  // const handleAadharNumberChange = (e: any = true) => {
-  //   setAadharNumber(e.target.value)
-  // }
-
-  // const handlePanNumberChange = (e: any = true) => {
-  //   setPanNumber(e.target.value)
-  // }
-
-  // const handleAadharFileChange = (e: any = true) => {
-  //   const file = e.target.files[0]
-  //   setAadharFile(file)
-  // }
-
-  // const handlePanFileChange = (e: any = true) => {
-  //   const file = e.target.files[0]
-  //   setPanFile(file)
-  // }
-
-  // const handleDocumentFilesChange = (e: any = true) => {
-  //   const files = Array.from(e.target.files)
-  //   const filteredFiles = files.filter((file: any = true) => {
-  //     const fileType = file.type.split('/')[0]
-  //     return fileType !== 'audio' && fileType !== 'video'
-  //   })
-
-  //   if (filteredFiles.length + documentFiles.length > 5) {
-  //     // Show error message that max 5 files can be uploaded
-  //     return
-  //   }
-
-  //   setDocumentFiles([...documentFiles, ...filteredFiles])
-  // }
-
   const formik = useFormik({
     initialValues: {
       aadharNumber: '',
@@ -92,42 +86,65 @@ const UploadFileModal = () => {
     onSubmit: async (values) => {
       //write upload file logic here
       const varToken = localStorage.getItem('token')
-      console.log(varToken)
+      console.log(values)
       const formData = new FormData()
+      console.log('hrutika1')
       formData.append('aadharNumber', values.aadharNumber)
       formData.append('panNumber', values.panNumber)
-      values.otherFiles.forEach((file, index) => {
-        formData.append(`otherFiles[${index}]`, file) // Assuming file is a File object
-      })
+      if (values.aadharCardFile !== null) {
+        formData.append('aadhar_card', values.aadharCardFile)
+      }
 
-      // Calling the api for the upload files = agent/account_files/upload-file
+      if (values.panCardFile !== null) {
+        formData.append('pan_card', values.panCardFile)
+      }
+
+      if (values.profilePicture !== null) {
+        formData.append('profile_picture', values.profilePicture)
+      }
+
+      for (let index = 0; index < values.otherFiles.length; index++) {
+        const file = values.otherFiles[index]
+        if (file !== null) {
+          formData.append(`otherFiles[${index}]`, file) // Assuming file is a File object
+        }
+      }
+      console.log('hrutika2')
+
       const id = location.state
       try {
-        const result = await api.post(
-          UPLOAD_FILES,
-          {appAgentId: id, formData},
-          {
-            headers: {
-              'Content-Type': 'multipart/form-data',
-              genie_access_token: 'Bearer ' + varToken,
-            },
-          }
-        )
+        console.log('inside try block')
+        const result = await api.post(UPLOAD_FILES, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        })
         console.log(result.data)
+        if (result.data.error == false) {
+          console.log('files uploaded successfully')
+          alert('Files uploaded successfully.')
+        }
       } catch (error) {
         console.log('Error while uploading the file: ', error)
       }
+      console.log('hrutika3')
     },
   })
   const handleFileChange = (field: any, event: any) => {
     formik.setFieldValue(field, event.currentTarget.files[0])
   }
 
+  const handleMultipleFileChange = (field: any, event: any) => {
+    console.log(event.currentTarget.files)
+    formik.setFieldValue(field, event.currentTarget.files)
+  }
+
   return (
     <div>
       <h6>Upload File</h6>
       {/* create an upload form where you will be taking aadhar number, pan number, aadhar file, pan file 
-      and in the other documents part maximum 5 files can be uploaded of any file type expect audio and video */}
+      and in the other documents part maximum 5 files can be uploaded of any file type except audio and video */}
       <form onSubmit={formik.handleSubmit} className='my-form form-label-right'>
         <div className='form-group row'>
           <label style={{color: 'blue'}} htmlFor='profilePicture' className='col-2 col-form-label'>
@@ -246,7 +263,7 @@ const UploadFileModal = () => {
               style={{border: 'none'}}
               accept='application/pdf, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.presentation, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, text/csv, application/vnd.openxmlformats-officedocument.wordprocessingml.document'
               className='form-control-file'
-              onChange={(event) => handleFileChange('otherFiles', event)}
+              onChange={(event) => handleMultipleFileChange('otherFiles', event)}
             />
 
             <p style={{color: 'orange'}} className='file-info'>

@@ -57,24 +57,24 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
     const URL = LOGOUT_URL
     const varToken = localStorage.getItem('token')
     try {
-      const result = await axios.post(
-        URL,
-        {},
-        {
-          headers: {
-            genie_access_token: 'Bearer ' + varToken,
-          },
-        }
-      )
-      console.log(result)
+      // const result = await axios.post(
+      //   URL,
+      //   {},
+      //   {
+      //     headers: {
+      //       genie_access_token: 'Bearer ' + varToken,
+      //     },
+      //   }
+      // )
+      // console.log(result)
     } catch (err) {
       console.log(err)
     } finally {
       saveAuth(undefined)
       setCurrentUser(undefined)
-      localStorage.removeItem('token')
-      const event = new CustomEvent('handleAuth')
-      window.dispatchEvent(event)
+      // localStorage.removeItem('token')
+      // const event = new CustomEvent('handleAuth')
+      // window.dispatchEvent(event)
     }
   }
 
