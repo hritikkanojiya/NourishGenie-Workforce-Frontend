@@ -95,6 +95,8 @@ const profileDetailsSchema = Yup.object().shape({
 const EditEmployeeDetails: React.FC = () => {
   const location: any = useLocation()
   const [loading, setLoading] = useState(false)
+  const [uploadDetailsSuccessful, setUploadDetailsSuccessful] = useState('')
+  const [uploadDetailsError, setUploadDetailsError] = useState('')
   const [data, setData] = useState<any>(null)
   const [dept, setDepartments] = useState<any>([])
   const [designations, setDesignation] = useState<any>([])
@@ -417,6 +419,8 @@ const EditEmployeeDetails: React.FC = () => {
     onSubmit: async (values, {setStatus, setSubmitting}) => {
       setIsLoading(true)
       setLoading(true)
+      setUploadDetailsError('')
+      setUploadDetailsSuccessful('')
       console.log(values)
       const url = GET_USER_UPDATE_DETAILS
       const varToken = localStorage.getItem('token')
@@ -471,11 +475,13 @@ const EditEmployeeDetails: React.FC = () => {
           }
         )
         console.log(res)
-        alert('Details updated successfully')
+        // alert('Details updated successfully')
+        setUploadDetailsSuccessful('Details updated successfully')
         setSubmitting(false)
         setLoading(false)
       } catch (error) {
         console.error(error)
+        setUploadDetailsError('The details entered are invalid')
         setSubmitting(false)
         setLoading(false)
       } finally {
@@ -485,673 +491,702 @@ const EditEmployeeDetails: React.FC = () => {
   })
 
   return (
-    <div className='card mb-5 mb-xl-10'>
-      <PageTitle breadcrumbs={permissionsBreadCrumbs}>View Employee</PageTitle>
-      {isLoading ? (
-        <div className='d-flex align-items-center justify-content-center loader-container'>
-          <Spinner animation='border' variant='primary' />
+    <>
+      {uploadDetailsSuccessful && (
+        <div className='alert alert-primary d-flex align-items-center p-5 mb-10'>
+          <span className='svg-icon svg-icon-2hx svg-icon-primary me-3'>...</span>
+
+          <div className='d-flex flex-column'>
+            <h5 className='mb-1'>Success</h5>
+            <span>{uploadDetailsSuccessful}</span>
+          </div>
         </div>
-      ) : (
-        <div id='kt_account_profile_details'>
-          <form onSubmit={formik.handleSubmit}>
-            {/* {Profile Section} */}
-            <div className='card shadow' style={{width: '100%', margin: '0 auto'}}>
-              <div className='card-body'>
-                <div>
-                  <h1 style={{color: 'darkorange'}} className='card-title'>
-                    Profile Section
-                  </h1>
-                </div>
+      )}
+      {uploadDetailsError && (
+        <div className='alert alert-primary d-flex align-items-center p-5 mb-10'>
+          <span className='svg-icon svg-icon-2hx svg-icon-primary me-3'>...</span>
 
-                <div className='row'>
-                  <div className='col'>
-                    <div className='form-group'>
-                      <label htmlFor='firstName'>First Name:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('first_name')}
-                      />
-                      {formik.touched.first_name && formik.errors.first_name && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.first_name}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='lastName'>Last Name:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('last_name')}
-                      />
-                      {formik.touched.last_name && formik.errors.last_name && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.last_name}</div>
-                        </div>
-                      )}
-                    </div>
+          <div className='d-flex flex-column'>
+            <h5 className='mb-1'>Invalid Details</h5>
+            <span>{uploadDetailsError}</span>
+          </div>
+        </div>
+      )}
+      <div className='card mb-5 mb-xl-10'>
+        <PageTitle breadcrumbs={permissionsBreadCrumbs}>View Employee</PageTitle>
+        {isLoading ? (
+          <div className='d-flex align-items-center justify-content-center loader-container'>
+            <Spinner animation='border' variant='primary' />
+          </div>
+        ) : (
+          <div id='kt_account_profile_details'>
+            <form onSubmit={formik.handleSubmit}>
+              {/* {Profile Section} */}
+              <div className='card shadow' style={{width: '100%', margin: '0 auto'}}>
+                <div className='card-body'>
+                  <div>
+                    <h1 style={{color: 'darkorange'}} className='card-title'>
+                      Profile Section
+                    </h1>
                   </div>
-                  <div className='col'>
-                    <div className='form-group'>
-                      <label htmlFor='email'>Email:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('email')}
-                      />
-                      {formik.touched.email && formik.errors.email && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.email}</div>
-                        </div>
-                      )}
+
+                  <div className='row'>
+                    <div className='col'>
+                      <div className='form-group'>
+                        <label htmlFor='firstName'>First Name:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('first_name')}
+                        />
+                        {formik.touched.first_name && formik.errors.first_name && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.first_name}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='lastName'>Last Name:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('last_name')}
+                        />
+                        {formik.touched.last_name && formik.errors.last_name && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.last_name}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className='col'>
+                      <div className='form-group'>
+                        <label htmlFor='email'>Email:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('email')}
+                        />
+                        {formik.touched.email && formik.errors.email && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.email}</div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* main div with display flex */}
-            <div style={{display: 'flex', justifyContent: 'space-around', width: '100%'}}>
-              {/* sub-div with display grid  (left side) */}
-              <div style={{display: 'grid', width: '48%'}}>
-                {/* {Basic Details} */}
-                <div
-                  className='card shadow'
-                  style={{
-                    alignContent: 'left',
-                    marginTop: '20px',
-                    padding: '20px',
-                  }}
-                >
-                  <div className='card-body'>
-                    <div>
-                      <h1 style={{color: 'darkorange'}} className='card-title'>
-                        Basic Details
-                      </h1>
-                      <br />
-                    </div>
-                    <div className='form-group'>
-                      <label htmlFor='gender'>Gender</label>
-                      <select
-                        style={{margin: '10px', width: '80%', marginBottom: '10px'}}
-                        className='form-select form-select-lg form-select-solid'
-                        {...formik.getFieldProps('gender')}
-                      >
-                        <option>Select Gender</option>
-                        <option>Male</option>
-                        <option>Female</option>
-                        <option>Others</option>
-                      </select>
-                      {formik.touched.gender && formik.errors.gender && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.gender}</div>
-                        </div>
-                      )}
-                    </div>
-
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='contact_number'>Contact Number</label>
-                      <input
-                        type='text'
-                        style={{margin: '10px', width: '80%'}}
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('contact_number')}
-                        onChange={formik.handleChange}
-                      />
-                      {formik.touched.contact_number && formik.errors.contact_number && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.contact_number}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='date_of_birth'>Date of Birth:</label>
+              {/* main div with display flex */}
+              <div style={{display: 'flex', justifyContent: 'space-around', width: '100%'}}>
+                {/* sub-div with display grid  (left side) */}
+                <div style={{display: 'grid', width: '48%'}}>
+                  {/* {Basic Details} */}
+                  <div
+                    className='card shadow'
+                    style={{
+                      alignContent: 'left',
+                      marginTop: '20px',
+                      padding: '20px',
+                    }}
+                  >
+                    <div className='card-body'>
                       <div>
-                        <LocalizationProvider dateAdapter={AdapterDayjs}>
-                          <DatePicker
-                            value={formik.values.date_of_birth}
-                            onChange={(newValue) => formik.setFieldValue('date_of_birth', newValue)}
-                          />
-                        </LocalizationProvider>
-                        {formik.touched.date_of_birth && formik.errors.date_of_birth && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.date_of_birth}</div>
-                          </div>
-                        )}
+                        <h1 style={{color: 'darkorange'}} className='card-title'>
+                          Basic Details
+                        </h1>
+                        <br />
                       </div>
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='marital_status'>Marital Status</label>
-                      <select
-                        style={{margin: '10px', width: '80%'}}
-                        className='form-select form-select-lg form-select-solid'
-                        {...formik.getFieldProps('marital_status')}
-                      >
-                        <option>Select Marital Status</option>
-                        <option>Single</option>
-                        <option>Married</option>
-                        <option>Seperated</option>
-                        <option>Divorced</option>
-                        <option>Widowed</option>
-                        <option>Other</option>
-                      </select>
-                      {formik.touched.marital_status && formik.errors.marital_status && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.marital_status}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {/* Bank Information */}
-                <div
-                  className='card shadow'
-                  style={{
-                    alignContent: 'left',
-                    marginTop: '20px',
-                    padding: '20px',
-                  }}
-                >
-                  <div className='card-body'>
-                    <div>
-                      <h1 style={{color: 'darkorange'}} className='card-title'>
-                        Bank Information
-                      </h1>
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='gender'>Bank Name:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('bank_name')}
-                      />
-                      {formik.touched.bank_name && formik.errors.bank_name && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.bank_name}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='gender'>Account Number:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('account_number')}
-                      />
-                      {formik.touched.account_number && formik.errors.account_number && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.account_number}</div>
-                        </div>
-                      )}
-                    </div>
-                    <div className='form-group'>
-                      <label htmlFor='contact_number'>Name as per bank:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('name_as_per_bank')}
-                      />
-                      {formik.touched.name_as_per_bank && formik.errors.name_as_per_bank && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.name_as_per_bank}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='date_of_birth'>IFSC Code:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('ifsc_code')}
-                      />
-                      {formik.touched.ifsc_code && formik.errors.ifsc_code && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.ifsc_code}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                {/* Address Information */}
-                <div
-                  className='card shadow'
-                  style={{
-                    alignContent: 'left',
-                    marginTop: '20px',
-                    padding: '20px',
-                  }}
-                >
-                  <div className='card-body'>
-                    <div>
-                      <h1 style={{color: 'darkorange'}} className='card-title'>
-                        Address Information
-                      </h1>
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='gender'>Country:</label>
-                      {countries.length !== 0 && (
+                      <div className='form-group'>
+                        <label htmlFor='gender'>Gender</label>
                         <select
-                          style={{margin: '10px', width: '100%'}}
+                          style={{margin: '10px', width: '80%', marginBottom: '10px'}}
                           className='form-select form-select-lg form-select-solid'
-                          value={formik.values.country}
-                          onChange={(e) => {
-                            console.log('Hello')
-                            formik.setFieldValue('country', e.target.value)
-                            load_states(
-                              e.target.options[e.target.selectedIndex].dataset.countryShortId
-                            )
-                          }}
+                          {...formik.getFieldProps('gender')}
                         >
-                          <option>Select Country</option>
-                          {countries.map((country) => (
-                            <option
-                              key={country.countryShortId}
-                              value={country._id}
-                              data-country-short-id={country.countryShortId}
-                            >
-                              {country.name}
-                            </option>
-                          ))}
+                          <option>Select Gender</option>
+                          <option>Male</option>
+                          <option>Female</option>
+                          <option>Others</option>
                         </select>
-                      )}
-                      {formik.touched.country && formik.errors.country && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.country}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='gender'>State:</label>
-                      <select
-                        style={{margin: '10px', width: '100%'}}
-                        className='form-select form-select-lg form-select-solid'
-                        value={formik.values.state}
-                        onChange={(e) => {
-                          formik.setFieldValue('state', e.target.value)
-                          load_cities(e.target.options[e.target.selectedIndex].dataset.stateShortId)
-                        }}
-                      >
-                        <option>Select State</option>
-                        {states.map((state) => (
-                          <option
-                            value={state._id}
-                            key={state.stateShortId}
-                            data-state-short-id={state.stateShortId}
-                          >
-                            {state.name}
-                          </option>
-                        ))}
-                      </select>
-                      {formik.touched.state && formik.errors.state && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.state}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='contact_number'>City:</label>
-                      <select
-                        style={{margin: '10px', width: '100%'}}
-                        className='form-select form-select-lg form-select-solid'
-                        value={formik.values.city}
-                        onChange={(e) => {
-                          formik.setFieldValue('city', e.target.value)
-                        }}
-                      >
-                        <option>Select City</option>
-                        {cities.map((city) => (
-                          <option value={city._id} key={city.cityShortId}>
-                            {city.name}
-                          </option>
-                        ))}
-                      </select>
-                      {formik.touched.city && formik.errors.city && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.city}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-
-                    <div className='form-group'>
-                      <label htmlFor='date_of_birth'>Address:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('address')}
-                      />
-                      {formik.touched.address && formik.errors.address && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.address}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='contact_number'>Landmark:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('landmark')}
-                      />
-                      {formik.touched.landmark && formik.errors.landmark && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.landmark}</div>
-                        </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='contact_number'>Pincode:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('pincode')}
-                      />
-                      {formik.touched.pincode && formik.errors.pincode && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.pincode}</div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              {/* sub div with display grid (right side) */}
-              <div style={{display: 'grid', width: '48%'}}>
-                {/* {Work Details} */}
-                <div
-                  className='card shadow'
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'flex-end',
-                    marginTop: '20px',
-                    padding: '20px',
-                  }}
-                >
-                  <div className='card-body'>
-                    <div>
-                      <h1 style={{color: 'darkorange'}} className='card-title'>
-                        Work Information
-                      </h1>
+                        {formik.touched.gender && formik.errors.gender && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.gender}</div>
+                          </div>
+                        )}
+                      </div>
 
                       <br />
-                      {/* primary email */}
                       <div className='form-group'>
-                        <label htmlFor='contact_number'>Primary Email:</label>
+                        <label htmlFor='contact_number'>Contact Number</label>
                         <input
                           type='text'
                           style={{margin: '10px', width: '80%'}}
                           className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                          {...formik.getFieldProps('primary_email')}
+                          {...formik.getFieldProps('contact_number')}
                           onChange={formik.handleChange}
                         />
-                        {formik.touched.primary_email && formik.errors.primary_email && (
+                        {formik.touched.contact_number && formik.errors.contact_number && (
                           <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.primary_email}</div>
+                            <div className='fv-help-block'>{formik.errors.contact_number}</div>
                           </div>
                         )}
                       </div>
                       <br />
-                      {/* company email */}
                       <div className='form-group'>
-                        <label htmlFor='contact_number'>Company Email:</label>
-                        <input
-                          type='text'
-                          style={{margin: '10px', width: '80%'}}
-                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                          {...formik.getFieldProps('company_email')}
-                          onChange={formik.handleChange}
-                        />
-                        {formik.touched.company_email && formik.errors.company_email && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.company_email}</div>
-                          </div>
-                        )}
-                      </div>
-                      <br />
-                      {/* salary */}
-                      <div className='form-group'>
-                        <label htmlFor='contact_number'>Salary:</label>
-                        <input
-                          type='text'
-                          style={{margin: '10px', width: '80%'}}
-                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                          {...formik.getFieldProps('salary')}
-                          onChange={formik.handleChange}
-                        />
-                        {formik.touched.salary && formik.errors.salary && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.salary}</div>
-                          </div>
-                        )}
-                      </div>
-                      <br />
-                      {/* date of joining */}
-                      <div className='form-group'>
-                        <label htmlFor='date_of_joining'>Date of Joining:</label>
+                        <label htmlFor='date_of_birth'>Date of Birth:</label>
                         <div>
                           <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker
-                              value={formik.values.date_of_joining}
+                              value={formik.values.date_of_birth}
                               onChange={(newValue) =>
-                                formik.setFieldValue('date_of_joining', newValue)
+                                formik.setFieldValue('date_of_birth', newValue)
                               }
                             />
                           </LocalizationProvider>
-                        </div>
-                        {formik.touched.date_of_joining && formik.errors.date_of_joining && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.date_of_joining}</div>
-                          </div>
-                        )}
-                      </div>
-                      <br />
-                      {/* employee type */}
-                      <div className='form-group'>
-                        <label htmlFor='employee_type'>Employee Type</label>
-                        <select
-                          style={{margin: '10px', width: '80%'}}
-                          className='form-select form-select-lg form-select-solid'
-                          {...formik.getFieldProps('employee_type')}
-                        >
-                          <option>Select Employee Type</option>
-                          <option>Permanent</option>
-                          <option>Internship</option>
-                          <option>Part-time</option>
-                          <option>Freelancer</option>
-                        </select>
-                        {formik.touched.employee_type && formik.errors.employee_type && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.employee_type}</div>
-                          </div>
-                        )}
-                      </div>
-                      <br />
-                      {/* working hours */}
-                      <div className='form-group'>
-                        <label htmlFor='gender'>Working Hours</label>
-                        <select
-                          style={{margin: '10px', width: '80%'}}
-                          className='form-select form-select-lg form-select-solid'
-                          {...formik.getFieldProps('working_hours')}
-                        >
-                          <option value=''>Select Working Hours</option>
-                          <option>4-5 hrs</option>
-                          <option>5-6 hrs</option>
-                          <option>6-7 hrs</option>
-                          <option>8-9 hrs</option>
-                        </select>
-                        {formik.touched.working_hours && formik.errors.working_hours && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.working_hours}</div>
-                          </div>
-                        )}
-                      </div>
-                      <br />
-                      {/* department */}
-                      <div className='form-group'>
-                        <label htmlFor='department'>Department:</label>
-                        <div style={{display: 'flex'}}>
-                          <select
-                            style={{margin: '10px', width: '80%'}}
-                            className='form-select form-select-lg form-select-solid'
-                            {...formik.getFieldProps('appDepartmentId')}
-                          >
-                            <option value=''>Select Department</option>
-                            {dept.map((dep: any) => (
-                              <option key={dep.appDepartmentId} value={dep.appDepartmentId}>
-                                {dep.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {formik.touched.appDepartmentId && formik.errors.appDepartmentId && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.appDepartmentId}</div>
-                          </div>
-                        )}
-                      </div>
-                      {/* designation */}
-                      <div className='form-group'>
-                        <label htmlFor='designatioin'>Designaiton:</label>
-                        <div style={{display: 'flex'}}>
-                          <select
-                            style={{margin: '10px', width: '80%'}}
-                            className='form-select form-select-lg form-select-solid'
-                            {...formik.getFieldProps('appDesignationId')}
-                          >
-                            <option value=''>Select Designation</option>
-                            {designations.map((dn: any) => (
-                              <option key={dn.appDesignationId} value={dn.appDesignationId}>
-                                {dn.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {formik.touched.appDesignationId && formik.errors.appDesignationId && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.appDesignationId}</div>
-                          </div>
-                        )}
-                      </div>
-                      {/* access group */}
-                      <div className='form-group'>
-                        <label htmlFor='accessGroup'>Access Group:</label>
-                        <div style={{display: 'flex'}}>
-                          <select
-                            style={{margin: '10px', width: '80%'}}
-                            className='form-select form-select-lg form-select-solid'
-                            {...formik.getFieldProps('appAccessGroupId')}
-                          >
-                            <option value=''>Select Access Groups</option>
-                            {accessGroup.map((agroup: any) => (
-                              <option key={agroup.appAccessGroupId} value={agroup.appAccessGroupId}>
-                                {agroup.name}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {formik.touched.appAccessGroupId && formik.errors.appAccessGroupId && (
-                          <div className='fv-plugins-message-container'>
-                            <div className='fv-help-block'>{formik.errors.appAccessGroupId}</div>
-                          </div>
-                        )}
-                      </div>
-                      {/* reporting managers */}
-                      <div className='form-group'>
-                        <label htmlFor='accessGroup'>Reporting Managers:</label>
-                        <div style={{display: 'flex'}}>
-                          <select
-                            style={{margin: '10px', width: '80%'}}
-                            className='form-select form-select-lg form-select-solid'
-                            {...formik.getFieldProps('appReportingManagerId')}
-                          >
-                            <option value=''>Select Reporting Manager</option>
-                            {managers.map((manager: any) => (
-                              <option key={manager.appManagerId} value={manager.appManagerId}>
-                                {manager.appAgentId.email}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        {formik.touched.appReportingManagerId &&
-                          formik.errors.appReportingManagerId && (
+                          {formik.touched.date_of_birth && formik.errors.date_of_birth && (
                             <div className='fv-plugins-message-container'>
-                              <div className='fv-help-block'>
-                                {formik.errors.appReportingManagerId}
-                              </div>
+                              <div className='fv-help-block'>{formik.errors.date_of_birth}</div>
                             </div>
                           )}
+                        </div>
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='marital_status'>Marital Status</label>
+                        <select
+                          style={{margin: '10px', width: '80%'}}
+                          className='form-select form-select-lg form-select-solid'
+                          {...formik.getFieldProps('marital_status')}
+                        >
+                          <option>Select Marital Status</option>
+                          <option>Single</option>
+                          <option>Married</option>
+                          <option>Seperated</option>
+                          <option>Divorced</option>
+                          <option>Widowed</option>
+                          <option>Other</option>
+                        </select>
+                        {formik.touched.marital_status && formik.errors.marital_status && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.marital_status}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Bank Information */}
+                  <div
+                    className='card shadow'
+                    style={{
+                      alignContent: 'left',
+                      marginTop: '20px',
+                      padding: '20px',
+                    }}
+                  >
+                    <div className='card-body'>
+                      <div>
+                        <h1 style={{color: 'darkorange'}} className='card-title'>
+                          Bank Information
+                        </h1>
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='gender'>Bank Name:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('bank_name')}
+                        />
+                        {formik.touched.bank_name && formik.errors.bank_name && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.bank_name}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='gender'>Account Number:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('account_number')}
+                        />
+                        {formik.touched.account_number && formik.errors.account_number && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.account_number}</div>
+                          </div>
+                        )}
+                      </div>
+                      <div className='form-group'>
+                        <label htmlFor='contact_number'>Name as per bank:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('name_as_per_bank')}
+                        />
+                        {formik.touched.name_as_per_bank && formik.errors.name_as_per_bank && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.name_as_per_bank}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='date_of_birth'>IFSC Code:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('ifsc_code')}
+                        />
+                        {formik.touched.ifsc_code && formik.errors.ifsc_code && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.ifsc_code}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  {/* Address Information */}
+                  <div
+                    className='card shadow'
+                    style={{
+                      alignContent: 'left',
+                      marginTop: '20px',
+                      padding: '20px',
+                    }}
+                  >
+                    <div className='card-body'>
+                      <div>
+                        <h1 style={{color: 'darkorange'}} className='card-title'>
+                          Address Information
+                        </h1>
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='gender'>Country:</label>
+                        {countries.length !== 0 && (
+                          <select
+                            style={{margin: '10px', width: '100%'}}
+                            className='form-select form-select-lg form-select-solid'
+                            value={formik.values.country}
+                            onChange={(e) => {
+                              console.log('Hello')
+                              formik.setFieldValue('country', e.target.value)
+                              load_states(
+                                e.target.options[e.target.selectedIndex].dataset.countryShortId
+                              )
+                            }}
+                          >
+                            <option>Select Country</option>
+                            {countries.map((country) => (
+                              <option
+                                key={country.countryShortId}
+                                value={country._id}
+                                data-country-short-id={country.countryShortId}
+                              >
+                                {country.name}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        {formik.touched.country && formik.errors.country && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.country}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='gender'>State:</label>
+                        <select
+                          style={{margin: '10px', width: '100%'}}
+                          className='form-select form-select-lg form-select-solid'
+                          value={formik.values.state}
+                          onChange={(e) => {
+                            formik.setFieldValue('state', e.target.value)
+                            load_cities(
+                              e.target.options[e.target.selectedIndex].dataset.stateShortId
+                            )
+                          }}
+                        >
+                          <option>Select State</option>
+                          {states.map((state) => (
+                            <option
+                              value={state._id}
+                              key={state.stateShortId}
+                              data-state-short-id={state.stateShortId}
+                            >
+                              {state.name}
+                            </option>
+                          ))}
+                        </select>
+                        {formik.touched.state && formik.errors.state && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.state}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='contact_number'>City:</label>
+                        <select
+                          style={{margin: '10px', width: '100%'}}
+                          className='form-select form-select-lg form-select-solid'
+                          value={formik.values.city}
+                          onChange={(e) => {
+                            formik.setFieldValue('city', e.target.value)
+                          }}
+                        >
+                          <option>Select City</option>
+                          {cities.map((city) => (
+                            <option value={city._id} key={city.cityShortId}>
+                              {city.name}
+                            </option>
+                          ))}
+                        </select>
+                        {formik.touched.city && formik.errors.city && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.city}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+
+                      <div className='form-group'>
+                        <label htmlFor='date_of_birth'>Address:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('address')}
+                        />
+                        {formik.touched.address && formik.errors.address && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.address}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='contact_number'>Landmark:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('landmark')}
+                        />
+                        {formik.touched.landmark && formik.errors.landmark && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.landmark}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='contact_number'>Pincode:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('pincode')}
+                        />
+                        {formik.touched.pincode && formik.errors.pincode && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.pincode}</div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
-                {/* Emergency contact information */}
-                <div
-                  className='card shadow'
-                  style={{
-                    alignContent: 'left',
-                    marginTop: '20px',
-                    padding: '20px',
-                  }}
-                >
-                  <div className='card-body'>
-                    <div>
-                      <h1 style={{color: 'darkorange'}} className='card-title'>
-                        Emergency Contact Information
-                      </h1>
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='gender'>Number:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('number')}
-                      />
-                      {formik.touched.number && formik.errors.number && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.number}</div>
+                {/* sub div with display grid (right side) */}
+                <div style={{display: 'grid', width: '48%'}}>
+                  {/* {Work Details} */}
+                  <div
+                    className='card shadow'
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'flex-end',
+                      marginTop: '20px',
+                      padding: '20px',
+                    }}
+                  >
+                    <div className='card-body'>
+                      <div>
+                        <h1 style={{color: 'darkorange'}} className='card-title'>
+                          Work Information
+                        </h1>
+
+                        <br />
+                        {/* primary email */}
+                        <div className='form-group'>
+                          <label htmlFor='contact_number'>Primary Email:</label>
+                          <input
+                            type='text'
+                            style={{margin: '10px', width: '80%'}}
+                            className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                            {...formik.getFieldProps('primary_email')}
+                            onChange={formik.handleChange}
+                          />
+                          {formik.touched.primary_email && formik.errors.primary_email && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.primary_email}</div>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                    <br />
-                    <div className='form-group'>
-                      <label htmlFor='gender'>Relation:</label>
-                      <input
-                        type='text'
-                        className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
-                        {...formik.getFieldProps('relation')}
-                      />
-                      {formik.touched.relation && formik.errors.relation && (
-                        <div className='fv-plugins-message-container'>
-                          <div className='fv-help-block'>{formik.errors.relation}</div>
+                        <br />
+                        {/* company email */}
+                        <div className='form-group'>
+                          <label htmlFor='contact_number'>Company Email:</label>
+                          <input
+                            type='text'
+                            style={{margin: '10px', width: '80%'}}
+                            className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                            {...formik.getFieldProps('company_email')}
+                            onChange={formik.handleChange}
+                          />
+                          {formik.touched.company_email && formik.errors.company_email && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.company_email}</div>
+                            </div>
+                          )}
                         </div>
-                      )}
+                        <br />
+                        {/* salary */}
+                        <div className='form-group'>
+                          <label htmlFor='contact_number'>Salary:</label>
+                          <input
+                            type='text'
+                            style={{margin: '10px', width: '80%'}}
+                            className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                            {...formik.getFieldProps('salary')}
+                            onChange={formik.handleChange}
+                          />
+                          {formik.touched.salary && formik.errors.salary && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.salary}</div>
+                            </div>
+                          )}
+                        </div>
+                        <br />
+                        {/* date of joining */}
+                        <div className='form-group'>
+                          <label htmlFor='date_of_joining'>Date of Joining:</label>
+                          <div>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DatePicker
+                                value={formik.values.date_of_joining}
+                                onChange={(newValue) =>
+                                  formik.setFieldValue('date_of_joining', newValue)
+                                }
+                              />
+                            </LocalizationProvider>
+                          </div>
+                          {formik.touched.date_of_joining && formik.errors.date_of_joining && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.date_of_joining}</div>
+                            </div>
+                          )}
+                        </div>
+                        <br />
+                        {/* employee type */}
+                        <div className='form-group'>
+                          <label htmlFor='employee_type'>Employee Type</label>
+                          <select
+                            style={{margin: '10px', width: '80%'}}
+                            className='form-select form-select-lg form-select-solid'
+                            {...formik.getFieldProps('employee_type')}
+                          >
+                            <option>Select Employee Type</option>
+                            <option>Permanent</option>
+                            <option>Internship</option>
+                            <option>Part-time</option>
+                            <option>Freelancer</option>
+                          </select>
+                          {formik.touched.employee_type && formik.errors.employee_type && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.employee_type}</div>
+                            </div>
+                          )}
+                        </div>
+                        <br />
+                        {/* working hours */}
+                        <div className='form-group'>
+                          <label htmlFor='gender'>Working Hours</label>
+                          <select
+                            style={{margin: '10px', width: '80%'}}
+                            className='form-select form-select-lg form-select-solid'
+                            {...formik.getFieldProps('working_hours')}
+                          >
+                            <option value=''>Select Working Hours</option>
+                            <option>4-5 hrs</option>
+                            <option>5-6 hrs</option>
+                            <option>6-7 hrs</option>
+                            <option>8-9 hrs</option>
+                          </select>
+                          {formik.touched.working_hours && formik.errors.working_hours && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.working_hours}</div>
+                            </div>
+                          )}
+                        </div>
+                        <br />
+                        {/* department */}
+                        <div className='form-group'>
+                          <label htmlFor='department'>Department:</label>
+                          <div style={{display: 'flex'}}>
+                            <select
+                              style={{margin: '10px', width: '80%'}}
+                              className='form-select form-select-lg form-select-solid'
+                              {...formik.getFieldProps('appDepartmentId')}
+                            >
+                              <option value=''>Select Department</option>
+                              {dept.map((dep: any) => (
+                                <option key={dep.appDepartmentId} value={dep.appDepartmentId}>
+                                  {dep.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {formik.touched.appDepartmentId && formik.errors.appDepartmentId && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.appDepartmentId}</div>
+                            </div>
+                          )}
+                        </div>
+                        {/* designation */}
+                        <div className='form-group'>
+                          <label htmlFor='designatioin'>Designaiton:</label>
+                          <div style={{display: 'flex'}}>
+                            <select
+                              style={{margin: '10px', width: '80%'}}
+                              className='form-select form-select-lg form-select-solid'
+                              {...formik.getFieldProps('appDesignationId')}
+                            >
+                              <option value=''>Select Designation</option>
+                              {designations.map((dn: any) => (
+                                <option key={dn.appDesignationId} value={dn.appDesignationId}>
+                                  {dn.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {formik.touched.appDesignationId && formik.errors.appDesignationId && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.appDesignationId}</div>
+                            </div>
+                          )}
+                        </div>
+                        {/* access group */}
+                        <div className='form-group'>
+                          <label htmlFor='accessGroup'>Access Group:</label>
+                          <div style={{display: 'flex'}}>
+                            <select
+                              style={{margin: '10px', width: '80%'}}
+                              className='form-select form-select-lg form-select-solid'
+                              {...formik.getFieldProps('appAccessGroupId')}
+                            >
+                              <option value=''>Select Access Groups</option>
+                              {accessGroup.map((agroup: any) => (
+                                <option
+                                  key={agroup.appAccessGroupId}
+                                  value={agroup.appAccessGroupId}
+                                >
+                                  {agroup.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {formik.touched.appAccessGroupId && formik.errors.appAccessGroupId && (
+                            <div className='fv-plugins-message-container'>
+                              <div className='fv-help-block'>{formik.errors.appAccessGroupId}</div>
+                            </div>
+                          )}
+                        </div>
+                        {/* reporting managers */}
+                        <div className='form-group'>
+                          <label htmlFor='accessGroup'>Reporting Managers:</label>
+                          <div style={{display: 'flex'}}>
+                            <select
+                              style={{margin: '10px', width: '80%'}}
+                              className='form-select form-select-lg form-select-solid'
+                              {...formik.getFieldProps('appReportingManagerId')}
+                            >
+                              <option value=''>Select Reporting Manager</option>
+                              {managers.map((manager: any) => (
+                                <option key={manager.appManagerId} value={manager.appManagerId}>
+                                  {manager.appAgentId.email}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          {formik.touched.appReportingManagerId &&
+                            formik.errors.appReportingManagerId && (
+                              <div className='fv-plugins-message-container'>
+                                <div className='fv-help-block'>
+                                  {formik.errors.appReportingManagerId}
+                                </div>
+                              </div>
+                            )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Emergency contact information */}
+                  <div
+                    className='card shadow'
+                    style={{
+                      alignContent: 'left',
+                      marginTop: '20px',
+                      padding: '20px',
+                    }}
+                  >
+                    <div className='card-body'>
+                      <div>
+                        <h1 style={{color: 'darkorange'}} className='card-title'>
+                          Emergency Contact Information
+                        </h1>
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='gender'>Number:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('number')}
+                        />
+                        {formik.touched.number && formik.errors.number && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.number}</div>
+                          </div>
+                        )}
+                      </div>
+                      <br />
+                      <div className='form-group'>
+                        <label htmlFor='gender'>Relation:</label>
+                        <input
+                          type='text'
+                          className='form-control form-control-lg form-control-solid mb-3 mb-lg-0'
+                          {...formik.getFieldProps('relation')}
+                        />
+                        {formik.touched.relation && formik.errors.relation && (
+                          <div className='fv-plugins-message-container'>
+                            <div className='fv-help-block'>{formik.errors.relation}</div>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <button type='submit' className='btn btn-primary'>
-              Save Changes
-            </button>
-          </form>
-        </div>
-      )}
-    </div>
+              <button type='submit' className='btn btn-primary'>
+                Save Changes
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
 

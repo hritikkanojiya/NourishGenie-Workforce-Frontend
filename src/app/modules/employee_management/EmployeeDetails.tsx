@@ -127,6 +127,23 @@ function EmployeeDetails() {
                       {details.user_details ? details.user_details.email : ''}
                     </span>
                   </div>
+
+                  <div className='form-group' style={{marginTop: '20px'}}>
+                    <label
+                      style={{
+                        marginBottom: '8px',
+                        fontWeight: 'bold',
+                        color: 'blue',
+                        fontSize: '1.2em',
+                      }}
+                      htmlFor='appAgentIdOfDepartment'
+                    >
+                      Department Id:
+                    </label>
+                    <span style={{marginLeft: '8px', fontSize: '1.2em'}}>
+                      {details.user_details ? details.user_details.appAgentIdOfDepartment : ''}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>

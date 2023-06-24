@@ -165,6 +165,8 @@ const ProfileCard = () => {
     })()
   }, [])
   const [loading, setLoading] = useState(false)
+  const [invalidCredentialsError, setInvalidCredentialsError] = useState('')
+  const [createUserSuccessful, setCreateUserSuccessful] = useState('')
   const {loadDepartmentFunction} = useContext(DynamicFieldsContext)
   const {loadDesignationFunction} = useContext(DynamicFieldsContext)
   const {loadReportingManagerFunction} = useContext(DynamicFieldsContext)
@@ -341,6 +343,8 @@ const ProfileCard = () => {
     validationSchema: profileDetailsSchema,
     onSubmit: async (values) => {
       setIsLoading(true)
+      setCreateUserSuccessful('')
+      setInvalidCredentialsError('')
       // Handle form submission logic here
       const varToken = localStorage.getItem('token')
       try {
@@ -433,13 +437,12 @@ const ProfileCard = () => {
         console.log(result.data)
         if (result.data.error === false) {
           console.log(result.data.data)
-          alert('user created successfully')
-        }
-        if (result.data.error === true) {
-          alert('Email already exists')
+          // alert('user created successfully')
+          setCreateUserSuccessful('User created successfully')
         }
       } catch (err) {
         console.log(err)
+        setInvalidCredentialsError('The credentials you have entered is invalid')
       } finally {
         setIsLoading(false)
       }
@@ -540,6 +543,26 @@ const ProfileCard = () => {
 
   return (
     <>
+      {createUserSuccessful && (
+        <div className='alert alert-primary d-flex align-items-center p-5 mb-10'>
+          <span className='svg-icon svg-icon-2hx svg-icon-primary me-3'>...</span>
+
+          <div className='d-flex flex-column'>
+            <h5 className='mb-1'>Success</h5>
+            <span>{createUserSuccessful}</span>
+          </div>
+        </div>
+      )}
+      {invalidCredentialsError && (
+        <div className='alert alert-primary d-flex align-items-center p-5 mb-10'>
+          <span className='svg-icon svg-icon-2hx svg-icon-primary me-3'>...</span>
+
+          <div className='d-flex flex-column'>
+            <h5 className='mb-1'>Invalid Credentials</h5>
+            <span>{invalidCredentialsError}</span>
+          </div>
+        </div>
+      )}
       {isLoading ? (
         <div className='d-flex align-items-center justify-content-center loader-container'>
           <Spinner animation='border' variant='primary' />
