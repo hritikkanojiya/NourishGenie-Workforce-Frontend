@@ -67,12 +67,12 @@ const validationSchema = Yup.object().shape({
 // }
 
 const UploadFileModal = () => {
-  const location = useLocation()
-  const [aadharNumber, setAadharNumber] = useState('')
-  const [panNumber, setPanNumber] = useState('')
-  const [aadharFile, setAadharFile] = useState<any>([])
-  const [panFile, setPanFile] = useState<any>([])
-  const [documentFiles, setDocumentFiles] = useState<any>([])
+  // const location = useLocation()
+  // const [aadharNumber, setAadharNumber] = useState('')
+  // const [panNumber, setPanNumber] = useState('')
+  // const [aadharFile, setAadharFile] = useState<any>([])
+  // const [panFile, setPanFile] = useState<any>([])
+  // const [documentFiles, setDocumentFiles] = useState<any>([])
   const formik = useFormik({
     initialValues: {
       aadharNumber: '',
@@ -83,37 +83,40 @@ const UploadFileModal = () => {
       otherFiles: [],
     },
     validationSchema: validationSchema,
+
     onSubmit: async (values) => {
-      //write upload file logic here
       const varToken = localStorage.getItem('token')
       console.log(values)
       const formData = new FormData()
-      console.log('hrutika1')
       formData.append('aadharNumber', values.aadharNumber)
       formData.append('panNumber', values.panNumber)
       if (values.aadharCardFile !== null) {
         formData.append('aadhar_card', values.aadharCardFile)
       }
-
       if (values.panCardFile !== null) {
         formData.append('pan_card', values.panCardFile)
       }
-
       if (values.profilePicture !== null) {
         formData.append('profile_picture', values.profilePicture)
       }
-
       for (let index = 0; index < values.otherFiles.length; index++) {
         const file = values.otherFiles[index]
         if (file !== null) {
           formData.append(`otherFiles[${index}]`, file) // Assuming file is a File object
         }
       }
-      console.log('hrutika2')
+      // Log the files in the formData
+      const entries = formData.entries()
+      let entry = entries.next()
+      while (!entry.done) {
+        const [key, value] = entry.value
+        if (value instanceof File) {
+          console.log(`${key}:`, value)
+        }
+        entry = entries.next()
+      }
 
-      const id = location.state
       try {
-        console.log('inside try block')
         const result = await api.post(UPLOAD_FILES, formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -121,14 +124,13 @@ const UploadFileModal = () => {
           },
         })
         console.log(result.data)
-        if (result.data.error == false) {
+        if (result.data.error === false) {
           console.log('files uploaded successfully')
           alert('Files uploaded successfully.')
         }
       } catch (error) {
         console.log('Error while uploading the file: ', error)
       }
-      console.log('hrutika3')
     },
   })
   const handleFileChange = (field: any, event: any) => {
@@ -143,8 +145,6 @@ const UploadFileModal = () => {
   return (
     <div>
       <h6>Upload File</h6>
-      {/* create an upload form where you will be taking aadhar number, pan number, aadhar file, pan file 
-      and in the other documents part maximum 5 files can be uploaded of any file type except audio and video */}
       <form onSubmit={formik.handleSubmit} className='my-form form-label-right'>
         <div className='form-group row'>
           <label style={{color: 'blue'}} htmlFor='profilePicture' className='col-2 col-form-label'>

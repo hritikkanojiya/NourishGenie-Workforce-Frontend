@@ -107,22 +107,25 @@ function EmployeeFiles() {
         }
       )
       console.log(result)
-      setProfilePicture(result.data.data.appAgentFiles.profile_picture)
-      setPanCardNumber(result.data.data.appAgentFiles.pan_card_number)
-      setPanCard(result.data.data.appAgentFiles.pan_card_file)
-      setAadharCardNumber(result.data.data.appAgentFiles.aadhar_card_number)
-      setAadharCard(result.data.data.appAgentFiles.aadhar_card_file)
-      setOtherFiles(result.data.data.appAgentFiles.otherFiles)
+
       if (result.data.error === false) {
         console.log(result.data)
       }
       if (result.data.data.appAgentFiles === null) {
+        console.log('no files')
         setProfilePicture({})
         setPanCard({})
         setAadharCard({})
         setPanCardNumber('')
         setAadharCardNumber('')
         setOtherFiles([])
+      } else {
+        setProfilePicture(result.data.data.appAgentFiles.profile_picture)
+        setPanCardNumber(result.data.data.appAgentFiles.pan_card_number)
+        setPanCard(result.data.data.appAgentFiles.pan_card_file)
+        setAadharCardNumber(result.data.data.appAgentFiles.aadhar_card_number)
+        setAadharCard(result.data.data.appAgentFiles.aadhar_card_file)
+        setOtherFiles(result.data.data.appAgentFiles.otherFiles)
       }
     } catch (error) {
       console.log(error)
@@ -135,6 +138,10 @@ function EmployeeFiles() {
     const id = location.state
     window.open(`http://localhost:5500/${id}/documents/${file}`, '_blank')
   }
+  console.log(
+    aadharCard && aadharCard.original_name ? aadharCard.original_name : 'No Aadhar Card Uploaded'
+  )
+
   return (
     <>
       {loading ? (
@@ -169,7 +176,7 @@ function EmployeeFiles() {
                       Aaadhar Number:
                     </label>
                     <span style={{marginLeft: '8px', fontSize: '1.2em', fontWeight: 'bold'}}>
-                      {aadharCardNumber}
+                      {aadharCardNumber ? aadharCardNumber : 'No Aadhar Card Number Uploaded'}
                     </span>
                   </div>
 
@@ -186,7 +193,7 @@ function EmployeeFiles() {
                       Pan Number:
                     </label>
                     <span style={{marginLeft: '8px', fontSize: '1.2em', fontWeight: 'bold'}}>
-                      {panCardNumber}
+                      {panCardNumber ? panCardNumber : 'No Pan Card Number Uploaded'}
                     </span>
                   </div>
                 </div>
@@ -237,7 +244,7 @@ function EmployeeFiles() {
                     <td>1.</td>
                     <td>Profile Photo</td>
                     <td>
-                      {profilePicture
+                      {profilePicture && profilePicture.original_name
                         ? profilePicture.original_name
                         : 'No Profile Picture Uploaded'}
                     </td>
@@ -286,7 +293,11 @@ function EmployeeFiles() {
                   <tr>
                     <td>2.</td>
                     <td>Aadhar Number</td>
-                    <td>{aadharCard ? aadharCard.original_name : 'No Aadhar Card Uploaded'}</td>
+                    <td>
+                      {aadharCard && aadharCard.original_name
+                        ? aadharCard.original_name
+                        : 'No Aadhar Card Uploaded'}
+                    </td>
                     <td>
                       <button
                         onClick={() => {
@@ -332,7 +343,11 @@ function EmployeeFiles() {
                   <tr>
                     <td>2.</td>
                     <td>Pan Card</td>
-                    <td>{panCard ? panCard.original_name : 'No Pan Card Uploaded'}</td>
+                    <td>
+                      {panCard && panCard.original_name
+                        ? panCard.original_name
+                        : 'No Pan Card Uploaded'}
+                    </td>
                     <td>
                       <button
                         onClick={() => {
