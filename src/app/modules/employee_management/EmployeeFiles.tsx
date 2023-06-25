@@ -20,9 +20,10 @@ function EmployeeFiles() {
   const [otherFiles, setOtherFiles] = useState<any>([])
   const {FilemodalFunction} = React.useContext(UploadFileContext)
 
-  async function delete_file(file_name: string, file_id: any) {
+  async function delete_file(file_name: string, file_id: string) {
     const varToken = localStorage.getItem('token')
     try {
+      console.log(file_name, file_id)
       const result = await api.post(
         DELETE_FILE,
         {
@@ -35,6 +36,9 @@ function EmployeeFiles() {
         }
       )
       console.log(result.data)
+      if (result.data.data.error === false) {
+        alert('file deleted successfully.')
+      }
     } catch (error) {
       console.log(error)
     }
@@ -244,7 +248,9 @@ function EmployeeFiles() {
                     <td>1.</td>
                     <td>Profile Photo</td>
                     <td>
-                      {profilePicture && profilePicture.original_name
+                      {profilePicture &&
+                      profilePicture.original_name &&
+                      profilePicture.isDeleted === false
                         ? profilePicture.original_name
                         : 'No Profile Picture Uploaded'}
                     </td>
@@ -294,7 +300,7 @@ function EmployeeFiles() {
                     <td>2.</td>
                     <td>Aadhar Number</td>
                     <td>
-                      {aadharCard && aadharCard.original_name
+                      {aadharCard && aadharCard.original_name && aadharCard.isDeleted === false
                         ? aadharCard.original_name
                         : 'No Aadhar Card Uploaded'}
                     </td>
@@ -344,7 +350,7 @@ function EmployeeFiles() {
                     <td>2.</td>
                     <td>Pan Card</td>
                     <td>
-                      {panCard && panCard.original_name
+                      {panCard && panCard.original_name && panCard.isDeleted === false
                         ? panCard.original_name
                         : 'No Pan Card Uploaded'}
                     </td>

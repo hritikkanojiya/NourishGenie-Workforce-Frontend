@@ -103,36 +103,6 @@ const ProfileCard = () => {
     address: Yup.string().required('Address is required'),
     landmark: Yup.string().required('Landmark is required'),
     pincode: Yup.string().required('Pincode is required'),
-    //file information
-    // aadhar_number: Yup.string().required('Aadhar Number is required'),
-    // pan_number: Yup.string().required('Pan Number is required'),
-    // aadhar_card: Yup.mixed()
-    //   .test('fileFormat', 'Only PDF files are allowed', (value) => {
-    //     if (value && value.length > 0) {
-    //       const file = value[0]
-    //       return file.type === 'application/pdf'
-    //     }
-    //     return true // Allow empty field if required
-    //   })
-    //   .required('Please upload a PDF file'),
-    // pan_card: Yup.mixed().test('fileType', 'Only PDF files are allowed', (value) => {
-    //   if (!value) return true
-    //   const supportedFormats = ['application/pdf']
-    //   return supportedFormats.includes(value.type)
-    // }),
-    // documents: Yup.array()
-    //   .nullable()
-    //   .max(5, 'You can upload a maximum of 5 files')
-    //   .test('fileFormat', 'Invalid file format', (value) => {
-    //     if (value && value.length > 0) {
-    //       const allowedFormats = [
-    //         'application/pdf',
-    //         'application/msword',
-    //         'application/vnd.ms-powerpoint',
-    //         'application/vnd.ms-excel',
-    //         'text/csv',
-    //       ]
-
     //       for (let i = 0; i < value.length; i++) {
     //         const file = value[i]
     //         if (!allowedFormats.includes(file.type)) {
@@ -1081,10 +1051,10 @@ const ProfileCard = () => {
                         {...formik.getFieldProps('working_hours')}
                       >
                         <option value=''>Select Working Hours</option>
-                        <option>4-5 hrs</option>
-                        <option>5-6 hrs</option>
-                        <option>6-7 hrs</option>
-                        <option>8-9 hrs</option>
+                        <option>4-5</option>
+                        <option>5-6</option>
+                        <option>6-7</option>
+                        <option>8-9</option>
                       </select>
                       {formik.touched.working_hours && formik.errors.working_hours && (
                         <div className='fv-plugins-message-container'>

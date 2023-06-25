@@ -1,8 +1,6 @@
-import React, {useContext, useState} from 'react'
 import {useFormik} from 'formik'
 import api from '../../../RequestConfig'
 import * as Yup from 'yup'
-import {useLocation} from 'react-router-dom'
 import {Button} from 'react-bootstrap'
 
 const API_URL = process.env.REACT_APP_API_URL
@@ -55,16 +53,6 @@ const validationSchema = Yup.object().shape({
       return true // Allow empty field if required
     }),
 })
-
-//interface
-// interface FormValues {
-//   aadharNumber: string
-//   panNumber: string
-//   aadharCardFile: File | null
-//   panCardFile: File | null
-//   profilePicture: File | null
-//   otherFiles: File[]
-// }
 
 const UploadFileModal = () => {
   // const location = useLocation()
