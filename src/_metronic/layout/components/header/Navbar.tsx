@@ -3,7 +3,11 @@ import {KTSVG, toAbsoluteUrl} from '../../../helpers'
 import {HeaderNotificationsMenu, HeaderUserMenu, Search, ThemeModeSwitcher} from '../../../partials'
 import {useLayout} from '../../core'
 import {useAuth} from '../../../../app/modules/auth'
-
+import {useState} from 'react'
+import {useEffect} from 'react'
+import api from '../../../../app/modules/RequestConfig'
+const API_URL = process.env.REACT_APP_API_URL
+export const GET_USER_PROFILE = `${API_URL}/agent/account_files/get-profile-picture`
 const itemClass = 'ms-1 ms-lg-3'
 const btnClass =
   'btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px w-md-40px h-md-40px'
@@ -11,11 +15,39 @@ const userAvatarClass = 'symbol-35px symbol-md-40px'
 const btnIconClass = 'svg-icon-1'
 
 const Navbar = () => {
+  // useEffect(() => {
+  //   getUserProfile()
+  // }, [])
+  const [profilePicture, setProfilePicture] = useState('')
+
   const {config} = useLayout()
   const {currentUser} = useAuth()
 
   const first_name = currentUser?.username.split(' ')[0]
   const last_name = currentUser?.username.split(' ')[1]
+
+  const getUserProfile = async () => {
+    const id = currentUser?.appAgentId
+    const varToken = localStorage.getItem('token')
+    if (varToken) {
+      try {
+        const result = await api.post(
+          GET_USER_PROFILE,
+          {attachmentId: id},
+          {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          }
+        )
+        console.log(result)
+        setProfilePicture(result.data.profilePicture)
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  }
+
   return (
     <div className='app-navbar flex-shrink-0'>
       {/* <div className={clsx('app-navbar-item align-items-stretch', itemClass)}>
@@ -58,6 +90,8 @@ const Navbar = () => {
           data-kt-menu-attach='parent'
           data-kt-menu-placement='bottom-end'
         >
+          {' '}
+          {}
           <img src={`https://ui-avatars.com/api/?name=${first_name}+${last_name}`} alt='' />
         </div>
         <HeaderUserMenu />

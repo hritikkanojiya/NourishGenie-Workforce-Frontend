@@ -98,7 +98,7 @@ const EditDesignationModal = () => {
           }
         )
         console.log(result)
-        if (result.data.data.error !== false) {
+        if (result.data.error === false) {
           load_Designations()
           editModalFunction(false)
         }

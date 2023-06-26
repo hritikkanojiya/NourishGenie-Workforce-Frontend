@@ -2,8 +2,12 @@ import {useFormik} from 'formik'
 import api from '../../../RequestConfig'
 import * as Yup from 'yup'
 import {Button} from 'react-bootstrap'
+import {useLocation} from 'react-router-dom'
+import {useContext} from 'react'
+import {UploadFileContext} from '../../FilesContext'
 
 const API_URL = process.env.REACT_APP_API_URL
+export const GET_ALL_FILES = `${API_URL}/agent/account_files/get-files`
 export const UPLOAD_FILES = `${API_URL}/agent/account_files/upload-file`
 
 // const fileValidationSchema = Yup.object().shape({
@@ -55,12 +59,17 @@ const validationSchema = Yup.object().shape({
 })
 
 const UploadFileModal = () => {
-  // const location = useLocation()
-  // const [aadharNumber, setAadharNumber] = useState('')
-  // const [panNumber, setPanNumber] = useState('')
-  // const [aadharFile, setAadharFile] = useState<any>([])
-  // const [panFile, setPanFile] = useState<any>([])
-  // const [documentFiles, setDocumentFiles] = useState<any>([])
+  const location = useLocation()
+  const {agentId} = useContext(UploadFileContext)
+  const {
+    loadProfilePicture,
+    FilemodalFunction,
+    loadAadharCard,
+    loadPanNumber,
+    loadAadharNumber,
+    loadPanCard,
+    loadOtherFilesFunction,
+  } = useContext(UploadFileContext)
   const formik = useFormik({
     initialValues: {
       aadharNumber: '',
@@ -76,8 +85,9 @@ const UploadFileModal = () => {
       const varToken = localStorage.getItem('token')
       console.log(values)
       const formData = new FormData()
-      formData.append('aadharNumber', values.aadharNumber)
-      formData.append('panNumber', values.panNumber)
+      formData.append('appAgentId', agentId)
+      formData.append('aadhar_number', values.aadharNumber)
+      formData.append('pan_number', values.panNumber)
       if (values.aadharCardFile !== null) {
         formData.append('aadhar_card', values.aadharCardFile)
       }
@@ -90,7 +100,7 @@ const UploadFileModal = () => {
       for (let index = 0; index < values.otherFiles.length; index++) {
         const file = values.otherFiles[index]
         if (file !== null) {
-          formData.append(`otherFiles[${index}]`, file) // Assuming file is a File object
+          formData.append(`otherFiles`, file) // Assuming file is a File object
         }
       }
       // Log the files in the formData
@@ -114,7 +124,9 @@ const UploadFileModal = () => {
         console.log(result.data)
         if (result.data.error === false) {
           console.log('files uploaded successfully')
+          load_files()
           alert('Files uploaded successfully.')
+          FilemodalFunction(false)
         }
       } catch (error) {
         console.log('Error while uploading the file: ', error)
@@ -123,6 +135,52 @@ const UploadFileModal = () => {
   })
   const handleFileChange = (field: any, event: any) => {
     formik.setFieldValue(field, event.currentTarget.files[0])
+  }
+
+  async function load_files() {
+    //function
+    //setLoading(true)
+    const varToken = localStorage.getItem('token')
+    console.log(agentId)
+    try {
+      const result = await api.post(
+        GET_ALL_FILES,
+        {
+          appAgentId: agentId,
+        },
+        {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        }
+      )
+      console.log(result)
+
+      if (result.data.error === false) {
+        console.log(result.data)
+      }
+      if (result.data.data.appAgentFiles === null) {
+        console.log('no files')
+        loadProfilePicture({})
+        loadPanCard({})
+        loadPanNumber('')
+        loadAadharNumber('')
+        loadAadharCard({})
+        loadOtherFilesFunction([])
+      } else {
+        loadProfilePicture(result.data.data.appAgentFiles.profile_picture)
+        loadAadharNumber(result.data.data.appAgentFiles.aadhar_card_number)
+        loadPanNumber(result.data.data.appAgentFiles.pan_card_number)
+        loadPanCard(result.data.data.appAgentFiles.pan_card_file)
+        loadAadharCard(result.data.data.appAgentFiles.aadhar_card_file)
+        loadOtherFilesFunction(result.data.data.appAgentFiles.otherFiles)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    // } finally {
+    //   setLoading(false)
+    // }
   }
 
   const handleMultipleFileChange = (field: any, event: any) => {

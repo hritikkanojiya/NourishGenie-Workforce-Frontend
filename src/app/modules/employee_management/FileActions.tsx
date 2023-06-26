@@ -6,7 +6,6 @@ import {UploadFileContext} from './FilesContext'
 const FileActions = () => {
   const {isFileUploadModalOpen} = useContext(UploadFileContext)
   console.log(isFileUploadModalOpen)
-  console.log('hello hrutika')
   return (
     <div>
       {isFileUploadModalOpen && <UploadFileWrapper />}

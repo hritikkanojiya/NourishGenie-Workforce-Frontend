@@ -97,7 +97,7 @@ const EditDepartmentModal = () => {
           }
         )
         console.log(result)
-        if (result.data.data.error !== false) {
+        if (result.data.error === false) {
           load_departments()
           editModalFunction(false)
         }

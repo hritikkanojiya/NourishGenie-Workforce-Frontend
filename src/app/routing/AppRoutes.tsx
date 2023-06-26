@@ -11,7 +11,9 @@ import {PrivateRoutes} from './PrivateRoutes'
 import {ErrorsPage} from '../modules/errors/ErrorsPage'
 import {Logout, AuthPage, useAuth} from '../modules/auth'
 import {App} from '../App'
-
+import api from '../../../src/app/modules/RequestConfig'
+const API_URL = process.env.REACT_APP_API_URL
+export const GET_USER_BY_TOKEN = `${API_URL}/agent/auth/getAgentByToken`
 /**
  * Base URL of the website.
  *
@@ -21,6 +23,8 @@ const {PUBLIC_URL} = process.env
 
 const AppRoutes: FC = () => {
   const {currentUser} = useAuth()
+  const {setCurrentUser} = useAuth()
+
   const [token, setToken] = useState(localStorage.getItem('token'))
 
   useEffect(() => {
@@ -36,7 +40,25 @@ const AppRoutes: FC = () => {
   }, [token]) // Include 'token' as a dependency
 
   console.log(token)
+  useEffect(() => {
+    const getUser = async () => {
+      const varToken = localStorage.getItem('token')
+      if (token) {
+        try {
+          const result = await api.get(GET_USER_BY_TOKEN, {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          })
 
+          setCurrentUser(result.data.agent)
+        } catch (err) {
+          console.log(err)
+        }
+      }
+    }
+    getUser()
+  }, [token])
   return (
     <BrowserRouter basename={PUBLIC_URL}>
       <Routes>

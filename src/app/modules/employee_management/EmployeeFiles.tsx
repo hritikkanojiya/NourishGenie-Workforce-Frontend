@@ -11,36 +11,58 @@ export const UPDATE_FILE = `${API_URL}/agent/account_files/update-file`
 
 function EmployeeFiles() {
   // States to store the files.
-  const [profilePicture, setProfilePicture] = useState<any>({})
-  const [aadharCard, setAadharCard] = useState<any>({})
-  const [panCard, setPanCard] = useState<any>({})
+  const {
+    loadProfilePicture,
+    loadAadharNumber,
+    loadPanNumber,
+    loadAadharCard,
+    loadPanCard,
+    loadAgentId,
+    loadOtherFilesFunction,
+  } = React.useContext(UploadFileContext)
+  const {profilePicture, aadharNumber, panNumber, aadharCard, panCard, otherFiles} =
+    React.useContext(UploadFileContext)
   const [loading, setLoading] = useState<boolean>(false)
-  const [aadharCardNumber, setAadharCardNumber] = useState<any>('')
-  const [panCardNumber, setPanCardNumber] = useState<any>('')
-  const [otherFiles, setOtherFiles] = useState<any>([])
   const {FilemodalFunction} = React.useContext(UploadFileContext)
 
   async function delete_file(file_name: string, file_id: string) {
     const varToken = localStorage.getItem('token')
+    let query: any = {}
+    if (file_name === 'profile_pictureId') {
+      query = {
+        profile_pictureId: file_id,
+      }
+    } else if (file_name === 'aadhar_cardId') {
+      query = {
+        aadhar_cardId: file_id,
+      }
+    } else if (file_name === 'pan_cardId') {
+      query = {
+        pan_cardId: file_id,
+      }
+    } else if (file_name === 'otherFilesId') {
+      query = {
+        otherFilesId: file_id,
+      }
+    }
+    setLoading(true)
     try {
       console.log(file_name, file_id)
-      const result = await api.post(
-        DELETE_FILE,
-        {
-          file_name: file_id,
+      const result = await api.post(DELETE_FILE, query, {
+        headers: {
+          genie_access_token: 'Bearer ' + varToken,
         },
-        {
-          headers: {
-            genie_access_token: 'Bearer ' + varToken,
-          },
-        }
-      )
+      })
       console.log(result.data)
-      if (result.data.data.error === false) {
+      if (result.data.error === false) {
+        const id = location.state
+        load_files(id)
         alert('file deleted successfully.')
       }
     } catch (error) {
       console.log(error)
+    } finally {
+      setLoading(false)
     }
   }
   //api call to update files
@@ -49,8 +71,8 @@ function EmployeeFiles() {
     const id: any = location.state
     const formData = new FormData()
     formData.append('appAgentId', id)
+
     formData.append(field_name, file_id)
-    formData.append('file', file)
     if (field_name === 'profile_pictureId') {
       formData.append('profile_picture', file)
     }
@@ -65,6 +87,7 @@ function EmployeeFiles() {
     }
 
     const varToken = localStorage.getItem('token')
+    setLoading(true)
     try {
       const result = await api.post(
         UPDATE_FILE,
@@ -78,14 +101,18 @@ function EmployeeFiles() {
       )
       console.log(result.data)
       if (result.data.error === false) {
-        alert('file uploaded successfully.')
+        load_files(id)
+        alert('file updated successfully.')
       }
     } catch (error) {
       console.log(error)
+    } finally {
+      setLoading(false)
     }
   }
   //api call to get all files
   const location = useLocation()
+  loadAgentId(location.state as any)
   useEffect(() => {
     ;(async () => {
       const id = location.state
@@ -117,19 +144,23 @@ function EmployeeFiles() {
       }
       if (result.data.data.appAgentFiles === null) {
         console.log('no files')
-        setProfilePicture({})
-        setPanCard({})
-        setAadharCard({})
-        setPanCardNumber('')
-        setAadharCardNumber('')
-        setOtherFiles([])
+        loadProfilePicture({})
+        loadPanCard({})
+        loadAadharCard({})
+        loadAadharNumber('')
+        loadPanNumber('')
+        // setPanCardNumber('')
+        // setAadharCardNumber('')
+        loadOtherFilesFunction([])
       } else {
-        setProfilePicture(result.data.data.appAgentFiles.profile_picture)
-        setPanCardNumber(result.data.data.appAgentFiles.pan_card_number)
-        setPanCard(result.data.data.appAgentFiles.pan_card_file)
-        setAadharCardNumber(result.data.data.appAgentFiles.aadhar_card_number)
-        setAadharCard(result.data.data.appAgentFiles.aadhar_card_file)
-        setOtherFiles(result.data.data.appAgentFiles.otherFiles)
+        loadProfilePicture(result.data.data.appAgentFiles.profile_picture)
+        //setPanCardNumber(result.data.data.appAgentFiles.pan_card_number)
+        loadPanCard(result.data.data.appAgentFiles.pan_card_file)
+        loadAadharNumber(result.data.data.appAgentFiles.aadhar_card_number)
+        loadPanNumber(result.data.data.appAgentFiles.pan_card_number)
+        //setAadharCardNumber(result.data.data.appAgentFiles.aadhar_card_number)
+        loadAadharCard(result.data.data.appAgentFiles.aadhar_card_file)
+        loadOtherFilesFunction(result.data.data.appAgentFiles.otherFiles)
       }
     } catch (error) {
       console.log(error)
@@ -180,7 +211,7 @@ function EmployeeFiles() {
                       Aaadhar Number:
                     </label>
                     <span style={{marginLeft: '8px', fontSize: '1.2em', fontWeight: 'bold'}}>
-                      {aadharCardNumber ? aadharCardNumber : 'No Aadhar Card Number Uploaded'}
+                      {aadharNumber ? aadharNumber : 'No Aadhar Card Number Uploaded'}
                     </span>
                   </div>
 
@@ -197,7 +228,7 @@ function EmployeeFiles() {
                       Pan Number:
                     </label>
                     <span style={{marginLeft: '8px', fontSize: '1.2em', fontWeight: 'bold'}}>
-                      {panCardNumber ? panCardNumber : 'No Pan Card Number Uploaded'}
+                      {panNumber ? panNumber : 'No Pan Card Number Uploaded'}
                     </span>
                   </div>
                 </div>
@@ -213,6 +244,8 @@ function EmployeeFiles() {
                 <h1 style={{color: 'darkorange'}} className='card-title'>
                   Employee Files
                 </h1>
+                {/* show button only if files are not uploaded */}
+
                 <button
                   onClick={() => {
                     FilemodalFunction(true)
@@ -262,7 +295,7 @@ function EmployeeFiles() {
                         className='btn'
                         style={{color: 'red'}}
                       >
-                        Delete
+                        {profilePicture.isDeleted === false ? 'Delete' : ''}
                       </button>
                     </td>
                     <td>
@@ -280,7 +313,7 @@ function EmployeeFiles() {
                           fileInput.click()
                         }}
                       >
-                        Update
+                        {profilePicture.isDeleted !== undefined ? 'Update' : ''}
                       </button>
                     </td>
                     <td>
@@ -291,14 +324,14 @@ function EmployeeFiles() {
                           preview_file(profilePicture.name)
                         }}
                       >
-                        Preview
+                        {profilePicture.isDeleted === false ? 'Preview' : ''}
                       </button>
                     </td>
                   </tr>
-                  {/* aadhar number  */}
+                  {/* aadhar card  */}
                   <tr>
                     <td>2.</td>
-                    <td>Aadhar Number</td>
+                    <td>Aadhar Card</td>
                     <td>
                       {aadharCard && aadharCard.original_name && aadharCard.isDeleted === false
                         ? aadharCard.original_name
@@ -312,7 +345,7 @@ function EmployeeFiles() {
                         className='btn'
                         style={{color: 'red'}}
                       >
-                        Delete
+                        {aadharCard.isDeleted === false ? 'Delete' : ''}
                       </button>
                     </td>
                     <td>
@@ -330,7 +363,7 @@ function EmployeeFiles() {
                           fileInput.click()
                         }}
                       >
-                        Update
+                        {aadharCard.isDeleted !== undefined ? 'Update' : ''}
                       </button>
                     </td>
                     <td>
@@ -341,13 +374,13 @@ function EmployeeFiles() {
                           preview_file(aadharCard.name)
                         }}
                       >
-                        Preview
+                        {aadharCard.isDeleted === false ? 'Preview' : ''}
                       </button>
                     </td>
                   </tr>
                   {/* pan card */}
                   <tr>
-                    <td>2.</td>
+                    <td>3.</td>
                     <td>Pan Card</td>
                     <td>
                       {panCard && panCard.original_name && panCard.isDeleted === false
@@ -362,7 +395,7 @@ function EmployeeFiles() {
                         className='btn'
                         style={{color: 'red'}}
                       >
-                        Delete
+                        {panCard.isDeleted === false ? 'Delete' : ''}
                       </button>
                     </td>
                     <td>
@@ -380,7 +413,7 @@ function EmployeeFiles() {
                           fileInput.click()
                         }}
                       >
-                        Update
+                        {panCard.isDeleted !== undefined ? 'Update' : ''}
                       </button>
                     </td>
                     <td>
@@ -391,7 +424,7 @@ function EmployeeFiles() {
                           preview_file(panCard.name)
                         }}
                       >
-                        Preview
+                        {panCard.isDeleted === false ? 'Preview' : ''}
                       </button>
                     </td>
                   </tr>
@@ -399,7 +432,7 @@ function EmployeeFiles() {
                   {otherFiles.map((file: any, index: any) => {
                     return (
                       <tr key={index}>
-                        <td>{index + 3}</td>
+                        <td>{index + 4}</td>
                         <td>Other Files</td>
                         <td>{file.original_name}</td>
                         <td>
@@ -410,7 +443,7 @@ function EmployeeFiles() {
                             className='btn'
                             style={{color: 'red'}}
                           >
-                            Delete
+                            {file.isDeleted === false ? 'Delete' : ''}
                           </button>
                         </td>
                         <td>
@@ -427,7 +460,7 @@ function EmployeeFiles() {
                               fileInput.click()
                             }}
                           >
-                            Update
+                            {file.isDeleted !== undefined ? 'Update' : ''}
                           </button>
                         </td>
                         <td>
@@ -438,7 +471,7 @@ function EmployeeFiles() {
                               preview_file(`otherFiles/${file.name}`)
                             }}
                           >
-                            Preview
+                            {file.isDeleted === false ? 'Preview' : ''}
                           </button>
                         </td>
                       </tr>

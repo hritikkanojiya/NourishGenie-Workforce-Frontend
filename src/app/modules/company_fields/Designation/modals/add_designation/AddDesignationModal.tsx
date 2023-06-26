@@ -63,7 +63,7 @@ const AddDesignationModal = () => {
         console.log(result)
         // Reset the form after successful submission
         formik.resetForm()
-        if (result.data.status === 'success') {
+        if (result.data.error === false) {
           modalFunction(false)
           load_Designations()
         }
