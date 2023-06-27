@@ -61,30 +61,24 @@ const EmployeeCard: FC<Props> = ({
         {/* Edit and Delete buttons */}
         <div className='d-flex justify-content-between'>
           <div style={{marginRight: '10px'}}>
-            <button
-              className='btn btn-success btn-sm'
-              style={{
-                border: '1px solid green',
-                color: 'black',
-                background: 'transparent',
-              }}
-            >
-              <Link to={'/crafted/employee_management/edit-details'} state={id}>
+            <button className='btn btn-success btn-sm'>
+              <Link
+                to={'/crafted/employee_management/edit-details'}
+                style={{color: 'white'}}
+                state={id}
+              >
                 Edit
               </Link>
             </button>
           </div>
 
           <div style={{marginRight: '10px'}}>
-            <button
-              className='btn btn-primary btn-sm'
-              style={{
-                border: '1px solid blue',
-                color: 'black',
-                background: 'transparent',
-              }}
-            >
-              <Link to={'/crafted/employee_management/employee-files'} state={id}>
+            <button className='btn btn-primary btn-sm'>
+              <Link
+                to={'/crafted/employee_management/employee-files'}
+                style={{color: 'white'}}
+                state={id}
+              >
                 Files
               </Link>
             </button>
@@ -96,11 +90,6 @@ const EmployeeCard: FC<Props> = ({
                 DeleteSingleUser(id)
               }}
               className='btn btn-danger btn-sm'
-              style={{
-                background: 'transparent',
-                border: '1px solid red',
-                color: 'black',
-              }}
             >
               Delete
             </button>

@@ -1,10 +1,14 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, {useEffect} from 'react'
+import React, {useEffect, useState} from 'react'
 import {EmployeeCard} from '../../../_metronic/partials/content/cards/EmployeeCard'
 import {PageLink, PageTitle} from '../../../_metronic/layout/core'
 import {Link} from 'react-router-dom'
 import {Spinner} from 'react-bootstrap'
 import api from '../RequestConfig'
+
+// font-awesome import
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {icon} from '@fortawesome/fontawesome-svg-core/import.macro'
 
 const permissionsBreadCrumbs: Array<PageLink> = [
   {
@@ -27,12 +31,25 @@ export const DELETE_SINGLE_USER = `${API_URL}/agent/account/delete-agent`
 export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
 function CompanyEmployees() {
+  //State for dropdown
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+
   const [employees, setEmployees] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [appDesignationId, setAppDesignationId] = React.useState<string | null>(null)
   const [appDepartmentId, setAppDepartmentId] = React.useState<string | null>(null)
   const [designations, setDesignations] = React.useState([])
   const [departments, setDepartments] = React.useState([])
+
+  // Defining variables for the pagination part
+  const [currentPage, setCurrentPage] = useState(1)
+  const recordsPerPage = 5
+  const lastIndex = currentPage * recordsPerPage
+  const firstIndex = lastIndex - recordsPerPage
+  const records = employees.slice(firstIndex, lastIndex)
+  const noOfPages = Math.ceil(employees.length / recordsPerPage)
+  const numbers = Array.from({length: noOfPages}, (_, i) => i + 1)
+
   //api calling
   useEffect(() => {
     ;(async () => {
@@ -46,6 +63,7 @@ function CompanyEmployees() {
       await Load()
     })()
   }, [appDesignationId, appDepartmentId])
+
   async function Load(parameter?: any) {
     setIsLoading(true)
     const varToken = localStorage.getItem('token')
@@ -149,7 +167,10 @@ function CompanyEmployees() {
   //   }
   //   await Load()
   // }
-  const employeeCards = employees.map((employee: any) => {
+
+  // Employee Card Function
+  // const employeeCards = employees.map((employee: any) => {
+  const employeeCards = records.map((employee: any) => {
     return (
       <div key={employee.appAgentId} className='col-md-6 col-xxl-4'>
         <EmployeeCard
@@ -162,39 +183,118 @@ function CompanyEmployees() {
       </div>
     )
   })
+
+  // Style for dropdown
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
+  const dropdownStyle = {
+    display: 'inline-block',
+  }
+  const buttonStyle = {
+    padding: '0.5rem 1rem',
+    fontSize: '14px',
+    lineHeight: '1.5',
+  }
+
+  const menuStyle = {
+    display: isMenuOpen ? 'block' : 'none',
+    minWidth: 'auto',
+    padding: '0',
+  }
+
+  const selectStyle = {
+    borderRadius: '0',
+    fontSize: '14px',
+  }
+
+  const containerStyle = {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    gap: '20px',
+    marginRight: '40px',
+  }
+
+  const containerStyleLeft = {
+    // display: 'flex',
+    // justifyContent: 'flex-start',
+    // marginLeft: 'auto',
+    // position: 'absolute' as 'absolute',
+    marginLeft: '10px',
+    marginRight: '10px',
+  }
+
+  // Defining functions for pagination
+  const prevPage = () => {
+    if (currentPage !== 1) {
+      setCurrentPage(currentPage - 1)
+    }
+  }
+
+  const nextPage = () => {
+    if (currentPage !== noOfPages) {
+      setCurrentPage(currentPage + 1)
+    }
+  }
+
+  const changeCurrentPage = (n: any = true) => {
+    setCurrentPage(n)
+  }
+
   return (
     <>
       <PageTitle breadcrumbs={permissionsBreadCrumbs}>Company Employees</PageTitle>
 
-      <div className='d-flex flex-wrap flex-stack mb-6'>
-        <select
-          style={{margin: '10px', width: '50%'}}
-          className='form-select form-select-lg form-select-solid'
-          onChange={(e) => {
-            setAppDesignationId(e.target.value !== 'null' ? e.target.value : null)
-          }}
-        >
-          <option value={'null'}>Filter Employees Designation</option>
-          {designations.map((dn: any) => (
-            <option key={dn.appDesignationId} value={dn.appDesignationId}>
-              {dn.name}
-            </option>
-          ))}
-        </select>
-        <select
-          style={{margin: '10px', width: '50%'}}
-          className='form-select form-select-lg form-select-solid'
-          onChange={(e) => {
-            setAppDepartmentId(e.target.value !== 'null' ? e.target.value : null)
-          }}
-        >
-          <option value={'null'}>Filter Employees Department</option>
-          {departments.map((dn: any) => (
-            <option key={dn.appDepartmentId} value={dn.appDepartmentId}>
-              {dn.name}
-            </option>
-          ))}
-        </select>
+      <div className='d-flex flex-wrap flex-stack mb-6' style={containerStyle}>
+        {/* Showing the number of employees on page */}
+        <div className='fs-6 fw-bold text-gray-700' style={containerStyleLeft}>
+          Showing {firstIndex + 1} to {lastIndex <= employees.length ? lastIndex : employees.length}{' '}
+          of {employees.length} Employees
+        </div>
+        {/* Dropdown menu for filter */}
+        <div style={dropdownStyle}>
+          <button
+            style={buttonStyle}
+            className='btn btn-primary dropdown-toggle'
+            type='button'
+            data-toggle='dropdown'
+            onClick={toggleMenu}
+          >
+            <FontAwesomeIcon icon={icon({name: 'filter'})} />
+          </button>
+          <div style={menuStyle} className='dropdown-menu dropdown-menu-sm dropdown-menu-right'>
+            <select
+              style={selectStyle}
+              className='form-select form-select-lg form-select-solid'
+              onChange={(e) => {
+                setAppDesignationId(e.target.value !== 'null' ? e.target.value : null)
+              }}
+            >
+              <option value={'null'}>Filter Employees Designation</option>
+              {designations.map((dn: any) => (
+                <option key={dn.appDesignationId} value={dn.appDesignationId}>
+                  {dn.name}
+                </option>
+              ))}
+            </select>
+            <select
+              style={selectStyle}
+              className='form-select form-select-lg form-select-solid'
+              onChange={(e) => {
+                setAppDepartmentId(e.target.value !== 'null' ? e.target.value : null)
+              }}
+            >
+              <option value={'null'}>Filter Employees Department</option>
+              {departments.map((dn: any) => (
+                <option key={dn.appDepartmentId} value={dn.appDepartmentId}>
+                  {dn.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+        {/* Create New Genie Button */}
         <Link
           to={'/crafted/employee_management/create-employee'}
           className='btn btn-primary btn-sm'
@@ -215,7 +315,7 @@ function CompanyEmployees() {
               <div className='row g-6 g-xl-9'>{employeeCards}</div>
 
               <div className='d-flex flex-stack flex-wrap pt-10'>
-                <div className='fs-6 fw-bold text-gray-700'>Showing 1 to 10 of 50 entries</div>
+                {/* <div className='fs-6 fw-bold text-gray-700'></div> */}
               </div>
             </>
           ) : (
@@ -225,6 +325,28 @@ function CompanyEmployees() {
           )}
         </>
       )}
+      <ul className='pagination'>
+        <li className='page-item previous'>
+          {/* eslint-disable-next-line */}
+          <a href='#' className='page-link'>
+            <i className='previous' onClick={prevPage}></i>
+          </a>
+        </li>
+        {numbers.map((n, i) => (
+          <li className={`page-item ${currentPage === n ? 'active' : ''}`} key={i}>
+            {/* eslint-disable-next-line */}
+            <a href='#' className='page-link' onClick={() => changeCurrentPage(n)}>
+              {n}
+            </a>
+          </li>
+        ))}
+        <li className='page-item next'>
+          {/* eslint-disable-next-line */}
+          <a href='#' className='page-link'>
+            <i className='next' onClick={nextPage}></i>
+          </a>
+        </li>
+      </ul>
     </>
   )
 }
