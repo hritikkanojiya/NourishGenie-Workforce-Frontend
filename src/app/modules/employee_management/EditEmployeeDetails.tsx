@@ -1019,10 +1019,10 @@ const EditEmployeeDetails: React.FC = () => {
                             {...formik.getFieldProps('working_hours')}
                           >
                             <option value=''>Select Working Hours</option>
-                            <option>4-5 hrs</option>
-                            <option>5-6 hrs</option>
-                            <option>6-7 hrs</option>
-                            <option>8-9 hrs</option>
+                            <option>4-5</option>
+                            <option>5-6</option>
+                            <option>6-7</option>
+                            <option>8-9</option>
                           </select>
                           {formik.touched.working_hours && formik.errors.working_hours && (
                             <div className='fv-plugins-message-container'>

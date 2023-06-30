@@ -4,6 +4,8 @@ import api from '../../RequestConfig'
 import {Dropdown, Spinner} from 'react-bootstrap'
 import {useContext} from 'react'
 import {DepartmentContext} from '../context/DepartmentContext'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faPencilAlt, faTrash} from '@fortawesome/free-solid-svg-icons'
 
 const permissionsBreadCrumbs: Array<PageLink> = [
   {
@@ -115,26 +117,26 @@ function Department() {
   return (
     <>
       <PageTitle breadcrumbs={permissionsBreadCrumbs}>Departments</PageTitle>
+      <div className='mb-4 d-flex'>
+        <input
+          type='text'
+          className='form-control'
+          placeholder='Search...'
+          value={search}
+          onChange={(e) => {
+            handleSearchChange(e.target.value)
+          }}
+        />
+        <button type='button' className='btn btn-primary' onClick={loadDepartments}>
+          Search
+        </button>
+      </div>
       {isLoading ? (
         <div className='d-flex align-items-center justify-content-center loader-container'>
           <Spinner animation='border' variant='primary' />
         </div>
       ) : (
         <>
-          <div className='mb-4 d-flex'>
-            <input
-              type='text'
-              className='form-control'
-              placeholder='Search...'
-              value={search}
-              onChange={(e) => {
-                handleSearchChange(e.target.value)
-              }}
-            />
-            <button type='button' className='btn btn-primary' onClick={loadDepartments}>
-              Search
-            </button>
-          </div>
           {/* Departments list */}
           <div className='d-flex flex-wrap flex-stack mb-6'>
             <h3 className='fw-bolder my-2'>Nourish Genie Departments</h3>
@@ -144,44 +146,35 @@ function Department() {
               </button>
             </div>
           </div>
-          <table className='table table-bordered table-hover'>
+          <table
+            id='kt_table_users'
+            className='table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer'
+          >
             <thead>
-              <tr>
+              <tr className='text-start text-muted fw-bolder fs-7 text-uppercase gs-0'>
                 <th className='align-middle'>#</th>
-                <th className='align-middle'>Department Name</th>
-                <th className='align-middle'>Actions</th>
+                <th className='align-middle col-8'>Department Name</th>
+                <th className='align-right'>Edit</th>
+                <th className='align-left'>Delete</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className='text-gray-600 fw-bold'>
               {departments.map((department: any, index: number) => (
                 <tr key={department.appDepartmentId}>
                   <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                   <td>{department.name}</td>
                   <td>
-                    <Dropdown>
-                      <Dropdown.Toggle
-                        id={`dropdown-${department.appDepartmentId}`}
-                        className=' bg-transparent'
-                        style={{color: 'black'}}
-                      >
-                        Actions
-                      </Dropdown.Toggle>
-
-                      <Dropdown.Menu>
-                        <Dropdown.Item
-                          className='dropdown-item'
-                          onClick={() => handleEdit(department.appDepartmentId)}
-                        >
-                          Edit
-                        </Dropdown.Item>
-                        <Dropdown.Item
-                          className='dropdown-item'
-                          onClick={() => deleteDepartment(department.appDepartmentId)}
-                        >
-                          Delete
-                        </Dropdown.Item>
-                      </Dropdown.Menu>
-                    </Dropdown>
+                    <button className='btn' onClick={() => handleEdit(department.appDepartmentId)}>
+                      <FontAwesomeIcon icon={faPencilAlt} size='1x' color='gray' />
+                    </button>
+                  </td>
+                  <td>
+                    <button
+                      className='btn'
+                      onClick={() => deleteDepartment(department.appDepartmentId)}
+                    >
+                      <FontAwesomeIcon icon={faTrash} size='1x' color='gray' />
+                    </button>
                   </td>
                 </tr>
               ))}

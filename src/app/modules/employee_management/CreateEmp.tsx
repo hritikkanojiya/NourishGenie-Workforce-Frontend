@@ -9,6 +9,7 @@ import {AdapterDayjs} from '@mui/x-date-pickers/AdapterDayjs'
 import {DatePicker} from '@mui/x-date-pickers/DatePicker'
 import {DynamicFieldsContext} from './FieldsContext'
 import {set} from 'date-fns'
+import {useNavigate} from 'react-router-dom'
 const API_URL = process.env.REACT_APP_API_URL
 export const CREATE_USER = `${API_URL}/agent/account/create-agent`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
@@ -199,6 +200,7 @@ const ProfileCard = () => {
     pan_card: [],
     documents: [],
   }
+  const navigate = useNavigate()
   // //get the total number of reporting managers in the company
   async function load_reporting_managers() {
     setIsLoading(true)
@@ -409,6 +411,11 @@ const ProfileCard = () => {
           console.log(result.data.data)
           // alert('user created successfully')
           setCreateUserSuccessful('User created successfully')
+          //naviage to the user list page
+          navigate('crafted/employee_management/company-employees')
+        } else {
+          console.log(result.data.data)
+          setInvalidCredentialsError('The credentials you have entered is invalid')
         }
       } catch (err) {
         console.log(err)
@@ -1236,18 +1243,20 @@ const ProfileCard = () => {
               </div>
             </div>
           </div>
-          <button
-            type='button'
-            onClick={() => {
-              formik.resetForm()
-            }}
-            className='btn btn-primary'
-          >
-            {'Clear Form'}
-          </button>
-          <button type='submit' className='btn btn-primary'>
-            Submit Changes
-          </button>
+          <div style={{display: 'flex', marginTop: '20px'}}>
+            <button
+              type='button'
+              onClick={() => {
+                formik.resetForm()
+              }}
+              className='btn btn-primary'
+            >
+              {'Clear Form'}
+            </button>
+            <button type='submit' style={{marginLeft: '20px'}} className='btn btn-primary'>
+              Submit Changes
+            </button>
+          </div>
         </form>
       )}
     </>

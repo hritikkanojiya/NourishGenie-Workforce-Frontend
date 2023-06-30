@@ -1,6 +1,9 @@
 import {useIntl} from 'react-intl'
 import {MenuItem} from './MenuItem'
 import {MenuInnerWithSub} from './MenuInnerWithSub'
+import {Dropdown} from 'react-bootstrap'
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faArchive} from '@fortawesome/free-solid-svg-icons'
 
 export function MenuInner() {
   // const intl = useIntl()

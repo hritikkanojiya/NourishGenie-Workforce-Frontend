@@ -2,6 +2,9 @@
 import React from 'react'
 import {useIntl} from 'react-intl'
 import {SidebarMenuItem} from './SidebarMenuItem'
+import {Dropdown} from 'react-bootstrap'
+import {Sidebar} from '../Sidebar'
+import {SidebarMenuItemWithSub} from './SidebarMenuItemWithSub'
 
 const SidebarMenuMain = () => {
   const intl = useIntl()
@@ -30,39 +33,27 @@ const SidebarMenuMain = () => {
         to={'crafted/permissions/access-groups'}
         title={'Access Groups'}
       ></SidebarMenuItem> */}
-      <div className='menu-item'>
-        <div className='menu-content pt-8 pb-2'>
-          <span className='menu-section text-muted text-uppercase fs-8 ls-1'>
-            <b>Employee Management</b>
-          </span>
-        </div>
-      </div>
-      <SidebarMenuItem
-        to={'crafted/employee_management/company-employees'}
-        title={'Company Employees'}
-      ></SidebarMenuItem>
-      <div className='menu-item'>
-        <div className='menu-content pt-8 pb-2'>
-          <span
-            style={{fontSize: 'bold'}}
-            className='menu-section text-muted text-uppercase fs-8 ls-1'
-          >
-            Company Fields
-          </span>
-        </div>
-      </div>
-      <SidebarMenuItem
-        to={'crafted/company_fields/department'}
-        title={'Department'}
-      ></SidebarMenuItem>
-      <SidebarMenuItem
-        to={'crafted/company_fields/designation'}
-        title={'Designation'}
-      ></SidebarMenuItem>
-      <SidebarMenuItem
-        to={'crafted/company_fields/reporting-managers'}
-        title={'Reporting Managers'}
-      ></SidebarMenuItem>
+      <SidebarMenuItemWithSub title={'Employee Management'} to={''}>
+        <SidebarMenuItem
+          to={'crafted/employee_management/company-employees'}
+          title={'Company Employees'}
+        ></SidebarMenuItem>
+      </SidebarMenuItemWithSub>
+
+      <SidebarMenuItemWithSub title={'Company Fields'} to={''}>
+        <SidebarMenuItem
+          to={'crafted/company_fields/department'}
+          title={'Department'}
+        ></SidebarMenuItem>
+        <SidebarMenuItem
+          to={'crafted/company_fields/designation'}
+          title={'Designation'}
+        ></SidebarMenuItem>
+        <SidebarMenuItem
+          to={'crafted/company_fields/reporting-managers'}
+          title={'Reporting Managers'}
+        ></SidebarMenuItem>
+      </SidebarMenuItemWithSub>
     </>
   )
 }

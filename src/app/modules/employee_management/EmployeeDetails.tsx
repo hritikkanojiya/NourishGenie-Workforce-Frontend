@@ -67,7 +67,7 @@ function EmployeeDetails() {
             <div className='card-body'>
               <div style={{display: 'flex'}}>
                 <div style={{flex: '1'}}>
-                  <h1 style={{color: 'darkorange'}} className='card-title'>
+                  <h1 style={{color: 'grey'}} className='card-title'>
                     Profile Section
                   </h1>
                 </div>
@@ -81,7 +81,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                     >
@@ -98,7 +98,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                     >
@@ -116,7 +116,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='email'
@@ -133,7 +133,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='appAgentIdOfDepartment'
@@ -165,7 +165,7 @@ function EmployeeDetails() {
               >
                 <div className='card-body'>
                   <div>
-                    <h1 style={{color: 'darkorange'}} className='card-title'>
+                    <h1 style={{color: 'grey'}} className='card-title'>
                       Basic Details
                     </h1>
                     <br />
@@ -175,7 +175,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='gender'
@@ -193,7 +193,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='marital_status'
@@ -210,7 +210,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='contact_number'
@@ -227,7 +227,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='date_of_birth'
@@ -253,7 +253,7 @@ function EmployeeDetails() {
               >
                 <div className='card-body'>
                   <div>
-                    <h1 style={{color: 'darkorange'}} className='card-title'>
+                    <h1 style={{color: 'grey'}} className='card-title'>
                       Bank Information
                     </h1>
                   </div>
@@ -263,7 +263,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='account_number'
@@ -280,7 +280,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='bank_name'
@@ -297,7 +297,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='name_as_per_bank'
@@ -314,7 +314,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='ifsc_code'
@@ -338,7 +338,7 @@ function EmployeeDetails() {
               >
                 <div className='card-body'>
                   <div>
-                    <h1 style={{color: 'darkorange'}} className='card-title'>
+                    <h1 style={{color: 'grey'}} className='card-title'>
                       Address Information
                     </h1>
                   </div>
@@ -348,7 +348,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='country'
@@ -365,7 +365,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='state'
@@ -383,7 +383,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='city'
@@ -400,7 +400,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='address'
@@ -417,7 +417,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='landmark'
@@ -434,7 +434,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='pincode'
@@ -462,7 +462,7 @@ function EmployeeDetails() {
               >
                 <div className='card-body'>
                   <div>
-                    <h1 style={{color: 'darkorange'}} className='card-title'>
+                    <h1 style={{color: 'grey'}} className='card-title'>
                       Work Information
                     </h1>
 
@@ -473,7 +473,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='primary_email'
@@ -491,7 +491,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='company_email'
@@ -509,7 +509,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='salary'
@@ -527,7 +527,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='date_of_joining'
@@ -547,7 +547,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='employee_type'
@@ -565,7 +565,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='working_hours'
@@ -583,7 +583,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='department'
@@ -601,7 +601,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='designation'
@@ -620,7 +620,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='department'
@@ -639,7 +639,7 @@ function EmployeeDetails() {
                         style={{
                           marginBottom: '8px',
                           fontWeight: 'bold',
-                          color: 'blue',
+                          color: 'black',
                           fontSize: '1.2em',
                         }}
                         htmlFor='reporting_manager'
@@ -669,7 +669,7 @@ function EmployeeDetails() {
               >
                 <div className='card-body'>
                   <div>
-                    <h1 style={{color: 'darkorange'}} className='card-title'>
+                    <h1 style={{color: 'grey'}} className='card-title'>
                       Emergency Contact Information
                     </h1>
                   </div>
@@ -679,7 +679,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='number'
@@ -696,7 +696,7 @@ function EmployeeDetails() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
+                        color: 'black',
                         fontSize: '1.2em',
                       }}
                       htmlFor='relation'
@@ -724,7 +724,7 @@ function EmployeeDetails() {
             >
               <div className='card-body'>
                 <div>
-                  <h1 style={{color: 'darkorange'}} className='card-title'>
+                  <h1 style={{color: 'grey', }} className='card-title'>
                     Files and Documents
                   </h1>
                   <br />

@@ -1,8 +1,10 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import {FC} from 'react'
+import {FC, useEffect, useState} from 'react'
 import {toAbsoluteUrl} from '../../../helpers'
 import {Link} from 'react-router-dom'
-
+import api from '../../../../app/modules/RequestConfig'
+const API_URL = process.env.REACT_APP_API_URL
+export const GET_PROFILE_PICTURE = `${API_URL}/agent/account_files/get-profile`
 type Props = {
   color?: string
   avatar?: string
@@ -22,8 +24,35 @@ const EmployeeCard: FC<Props> = ({
   DeleteSingleUser,
   id,
 }) => {
+  useEffect(() => {
+    getUserProfile()
+  }, [])
+  const [profilePicture, setProfilePicture] = useState('')
   const first_name = name.split(' ')[0]
   const last_name = name.split(' ')[1]
+  const getUserProfile = async () => {
+    const varToken = localStorage.getItem('token')
+    console.log(GET_PROFILE_PICTURE)
+    if (varToken) {
+      try {
+        const result = await api.post(
+          GET_PROFILE_PICTURE,
+          {
+            appAgentId: id,
+          },
+          {
+            headers: {
+              genie_access_token: 'Bearer ' + varToken,
+            },
+          }
+        )
+        console.log(result.data.data)
+        setProfilePicture(`http://localhost:8000/${result.data.data.profile_picture}`)
+      } catch (error) {
+        setProfilePicture(`https://ui-avatars.com/api/?name=${first_name}+${last_name}`)
+      }
+    }
+  }
   console.log(id)
   return (
     <div className='card'>
@@ -40,7 +69,7 @@ const EmployeeCard: FC<Props> = ({
                 {name.charAt(0)}
               </span>
             ) : (
-              <img alt='Pic' src={`https://ui-avatars.com/api/?name=${first_name}+${last_name}`} />
+              <img alt='Pic' src={profilePicture} />
             )}
             {online && (
               <div className='symbol-badge bg-success start-100 top-100 border-4 h-15px w-15px ms-n3 mt-n3'></div>

@@ -3,11 +3,17 @@ import api from '../RequestConfig'
 import {useLocation} from 'react-router-dom'
 import {Spinner} from 'react-bootstrap'
 import {UploadFileContext} from './FilesContext'
-
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome'
+import {faTrash, faTrashRestoreAlt} from '@fortawesome/free-solid-svg-icons'
+import {faEye} from '@fortawesome/free-solid-svg-icons'
+import {faBan} from '@fortawesome/free-solid-svg-icons'
+import {faUpload} from '@fortawesome/free-solid-svg-icons'
+import {faPencilAlt} from '@fortawesome/free-solid-svg-icons'
 const API_URL = process.env.REACT_APP_API_URL
 export const GET_ALL_FILES = `${API_URL}/agent/account_files/get-files`
 export const DELETE_FILE = `${API_URL}/agent/account_files/delete-file`
 export const UPDATE_FILE = `${API_URL}/agent/account_files/update-file`
+export const UPLOAD_SINGLE = `${API_URL}/agent/account_files/upload-single-file`
 
 function EmployeeFiles() {
   // States to store the files.
@@ -110,6 +116,50 @@ function EmployeeFiles() {
       setLoading(false)
     }
   }
+
+  //api call to update single file
+  async function update_single_file(file: any, file_id: any, field_name: string) {
+    const id: any = location.state
+    const formData = new FormData()
+    formData.append('appAgentId', id)
+
+    if (field_name === 'profile_pictureId') {
+      formData.append('profile_picture', file)
+    }
+    if (field_name === 'aadhar_cardId') {
+      formData.append('aadhar_card', file)
+    }
+    if (field_name === 'pan_cardId') {
+      formData.append('pan_card', file)
+    }
+    if (field_name === 'otherFilesId') {
+      formData.append('otherFiles', file)
+    }
+
+    const varToken = localStorage.getItem('token')
+    setLoading(true)
+    try {
+      const result = await api.post(
+        UPLOAD_SINGLE,
+        formData,
+
+        {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        }
+      )
+      console.log(result.data)
+      if (result.data.error === false) {
+        load_files(id)
+        alert('file updated successfully.')
+      }
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
+    }
+  }
   //api call to get all files
   const location = useLocation()
   loadAgentId(location.state as any)
@@ -142,7 +192,7 @@ function EmployeeFiles() {
       if (result.data.error === false) {
         console.log(result.data)
       }
-      if (result.data.data.appAgentFiles === null) {
+      if (result.data.data.appAgentFiles.length === 0) {
         console.log('no files')
         loadProfilePicture({})
         loadPanCard({})
@@ -171,7 +221,7 @@ function EmployeeFiles() {
 
   async function preview_file(file: any) {
     const id = location.state
-    window.open(`http://localhost:5500/${id}/documents/${file}`, '_blank')
+    window.open(`http://localhost:8000/${id}/documents/${file}`, '_blank')
   }
   console.log(
     aadharCard && aadharCard.original_name ? aadharCard.original_name : 'No Aadhar Card Uploaded'
@@ -190,7 +240,7 @@ function EmployeeFiles() {
             <div className='card-body'>
               <div style={{display: 'flex'}}>
                 <div style={{flex: '1'}}>
-                  <h1 style={{color: 'darkorange'}} className='card-title'>
+                  <h1 style={{color: 'black'}} className='card-title'>
                     Profile Section
                   </h1>
                 </div>
@@ -204,7 +254,6 @@ function EmployeeFiles() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
                         fontSize: '1.2em',
                       }}
                     >
@@ -221,7 +270,6 @@ function EmployeeFiles() {
                       style={{
                         marginBottom: '8px',
                         fontWeight: 'bold',
-                        color: 'blue',
                         fontSize: '1.2em',
                       }}
                     >
@@ -241,22 +289,44 @@ function EmployeeFiles() {
           <div className='card shadow' style={{width: '100%', margin: '0 auto'}}>
             <div className='card-body'>
               <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                <h1 style={{color: 'darkorange'}} className='card-title'>
+                <h1 style={{color: 'black'}} className='card-title'>
                   Employee Files
                 </h1>
                 {/* show button only if files are not uploaded */}
 
-                <button
-                  onClick={() => {
-                    FilemodalFunction(true)
-                  }}
-                  className='btn btn-primary btn-sm'
-                >
-                  Upload Files
-                </button>
+                {aadharNumber && !!otherFiles && (
+                  <button
+                    type='button'
+                    className='btn btn-primary btn-sm'
+                    onClick={() => {
+                      const fileInput = document.createElement('input')
+                      fileInput.type = 'file'
+                      fileInput.onchange = (event: any) => {
+                        const files = event.target.files
+                        update_single_file(files[0], aadharCard._id, 'otherFilesId')
+                      }
+                      fileInput.click()
+                    }}
+                  >
+                    Upload Other Files
+                  </button>
+                )}
+
+                {!aadharNumber && (
+                  <button
+                    onClick={() => {
+                      FilemodalFunction(true)
+                    }}
+                    className='btn btn-primary btn-sm'
+                  >
+                    <FontAwesomeIcon icon={faUpload} size='1x' color='black' />
+                  </button>
+                )}
               </div>
 
               <table
+                id='kt_table_users'
+                className='table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer'
                 style={{
                   width: '100%',
                   borderCollapse: 'collapse',
@@ -264,18 +334,21 @@ function EmployeeFiles() {
                 }}
               >
                 <thead>
-                  <tr>
+                  <tr className='text-start text-muted fw-bolder fs-7 text-uppercase gs-0'>
                     <th scope='col'>Serial Number</th>
                     <th scope='col'>File Type</th>
                     <th scope='col'>File Names</th>
-                    <th scope='col'></th>
+                    <th scope='col'>Delete</th>
                     <th style={{textAlign: 'center'}} scope='col'>
-                      Actions
+                      Update/Upload
+                    </th>
+                    <th style={{textAlign: 'right'}} scope='col'>
+                      Preview
                     </th>
                   </tr>
                 </thead>
 
-                <tbody>
+                <tbody className='text-gray-600 fw-bold'>
                   {/* profile picture row */}
                   <tr>
                     <td>1.</td>
@@ -295,28 +368,55 @@ function EmployeeFiles() {
                         className='btn'
                         style={{color: 'red'}}
                       >
-                        {profilePicture.isDeleted === false ? 'Delete' : ''}
+                        {profilePicture.isDeleted === false ? (
+                          <FontAwesomeIcon icon={faTrash} size='1x' color='black' />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        )}
                       </button>
                     </td>
-                    <td>
-                      <button
-                        type='button'
-                        className='btn'
-                        onClick={() => {
-                          const fileInput = document.createElement('input')
-                          fileInput.type = 'file'
-                          fileInput.onchange = (event: any) => {
-                            console.log('hello hrutika')
-                            const files = event.target.files
-                            update_file(files[0], profilePicture._id, 'profile_pictureId')
-                          }
-                          fileInput.click()
-                        }}
-                      >
-                        {profilePicture.isDeleted !== undefined ? 'Update' : ''}
-                      </button>
+                    <td style={{textAlign: 'center'}}>
+                      {profilePicture.isDeleted === false && (
+                        <button
+                          type='button'
+                          className='btn'
+                          onClick={() => {
+                            const fileInput = document.createElement('input')
+                            fileInput.type = 'file'
+                            fileInput.onchange = (event: any) => {
+                              const files = event.target.files
+                              update_file(files[0], profilePicture._id, 'profile_pictureId')
+                            }
+                            fileInput.click()
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faPencilAlt} size='1x' color='black' />
+                        </button>
+                      )}
+                      {profilePicture.isDeleted === true && (
+                        <button
+                          type='button'
+                          className='btn'
+                          onClick={() => {
+                            const fileInput = document.createElement('input')
+                            fileInput.type = 'file'
+                            fileInput.onchange = (event: any) => {
+                              const files = event.target.files
+                              update_single_file(files[0], profilePicture._id, 'profile_pictureId')
+                            }
+                            fileInput.click()
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faUpload} size='1x' color='black' />
+                        </button>
+                      )}
+                      {Object.keys(profilePicture).length === 0 && (
+                        <button type='button' className='btn'>
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        </button>
+                      )}
                     </td>
-                    <td>
+                    <td style={{textAlign: 'right'}}>
                       <button
                         type='button'
                         className='btn'
@@ -324,7 +424,11 @@ function EmployeeFiles() {
                           preview_file(profilePicture.name)
                         }}
                       >
-                        {profilePicture.isDeleted === false ? 'Preview' : ''}
+                        {profilePicture.isDeleted === false ? (
+                          <FontAwesomeIcon icon={faEye} size='1x' color='black' />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -345,28 +449,55 @@ function EmployeeFiles() {
                         className='btn'
                         style={{color: 'red'}}
                       >
-                        {aadharCard.isDeleted === false ? 'Delete' : ''}
+                        {aadharCard.isDeleted === false ? (
+                          <FontAwesomeIcon icon={faTrash} size='1x' color='black' />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        )}
                       </button>
                     </td>
-                    <td>
-                      <button
-                        type='button'
-                        className='btn'
-                        onClick={() => {
-                          const fileInput = document.createElement('input')
-                          fileInput.type = 'file'
-                          fileInput.onchange = (event: any) => {
-                            console.log('hello')
-                            const files = event.target.files
-                            update_file(files[0], aadharCard._id, 'aadhar_cardId')
-                          }
-                          fileInput.click()
-                        }}
-                      >
-                        {aadharCard.isDeleted !== undefined ? 'Update' : ''}
-                      </button>
+                    <td style={{textAlign: 'center'}}>
+                      {aadharCard.isDeleted === false && (
+                        <button
+                          type='button'
+                          className='btn'
+                          onClick={() => {
+                            const fileInput = document.createElement('input')
+                            fileInput.type = 'file'
+                            fileInput.onchange = (event: any) => {
+                              const files = event.target.files
+                              update_file(files[0], aadharCard._id, 'aadhar_cardId')
+                            }
+                            fileInput.click()
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faPencilAlt} size='1x' color='black' />
+                        </button>
+                      )}
+                      {aadharCard.isDeleted === true && (
+                        <button
+                          type='button'
+                          className='btn'
+                          onClick={() => {
+                            const fileInput = document.createElement('input')
+                            fileInput.type = 'file'
+                            fileInput.onchange = (event: any) => {
+                              const files = event.target.files
+                              update_single_file(files[0], aadharCard._id, 'aadhar_cardId')
+                            }
+                            fileInput.click()
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faUpload} size='1x' color='black' />
+                        </button>
+                      )}
+                      {Object.keys(aadharCard).length === 0 && (
+                        <button type='button' className='btn'>
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        </button>
+                      )}
                     </td>
-                    <td>
+                    <td style={{textAlign: 'right'}}>
                       <button
                         type='button'
                         className='btn'
@@ -374,7 +505,11 @@ function EmployeeFiles() {
                           preview_file(aadharCard.name)
                         }}
                       >
-                        {aadharCard.isDeleted === false ? 'Preview' : ''}
+                        {aadharCard.isDeleted === false ? (
+                          <FontAwesomeIcon icon={faEye} size='1x' color='black' />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -395,28 +530,55 @@ function EmployeeFiles() {
                         className='btn'
                         style={{color: 'red'}}
                       >
-                        {panCard.isDeleted === false ? 'Delete' : ''}
+                        {panCard.isDeleted === false ? (
+                          <FontAwesomeIcon icon={faTrash} size='1x' color='black' />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        )}
                       </button>
                     </td>
-                    <td>
-                      <button
-                        type='button'
-                        className='btn'
-                        onClick={() => {
-                          const fileInput = document.createElement('input')
-                          fileInput.type = 'file'
-                          fileInput.onchange = (event: any) => {
-                            console.log('hello')
-                            const file = event.target.files
-                            update_file(file[0], panCard._id, 'pan_cardId')
-                          }
-                          fileInput.click()
-                        }}
-                      >
-                        {panCard.isDeleted !== undefined ? 'Update' : ''}
-                      </button>
+                    <td style={{textAlign: 'center'}}>
+                      {panCard.isDeleted === false && (
+                        <button
+                          type='button'
+                          className='btn'
+                          onClick={() => {
+                            const fileInput = document.createElement('input')
+                            fileInput.type = 'file'
+                            fileInput.onchange = (event: any) => {
+                              const file = event.target.files
+                              update_file(file[0], panCard._id, 'pan_cardId')
+                            }
+                            fileInput.click()
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faPencilAlt} size='1x' color='black' />
+                        </button>
+                      )}
+                      {panCard.isDeleted === true && (
+                        <button
+                          type='button'
+                          className='btn'
+                          onClick={() => {
+                            const fileInput = document.createElement('input')
+                            fileInput.type = 'file'
+                            fileInput.onchange = (event: any) => {
+                              const file = event.target.files
+                              update_single_file(file[0], panCard._id, 'pan_cardId')
+                            }
+                            fileInput.click()
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faUpload} size='1x' color='black' />
+                        </button>
+                      )}
+                      {Object.keys(panCard).length === 0 && (
+                        <button type='button' className='btn'>
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        </button>
+                      )}
                     </td>
-                    <td>
+                    <td style={{textAlign: 'right'}}>
                       <button
                         type='button'
                         className='btn'
@@ -424,7 +586,11 @@ function EmployeeFiles() {
                           preview_file(panCard.name)
                         }}
                       >
-                        {panCard.isDeleted === false ? 'Preview' : ''}
+                        {panCard.isDeleted === false ? (
+                          <FontAwesomeIcon icon={faEye} size='1x' color='black' />
+                        ) : (
+                          <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                        )}
                       </button>
                     </td>
                   </tr>
@@ -443,10 +609,10 @@ function EmployeeFiles() {
                             className='btn'
                             style={{color: 'red'}}
                           >
-                            {file.isDeleted === false ? 'Delete' : ''}
+                            <FontAwesomeIcon icon={faTrash} size='1x' color='black' />
                           </button>
                         </td>
-                        <td>
+                        <td style={{textAlign: 'center'}}>
                           <button
                             type='button'
                             className='btn'
@@ -460,10 +626,19 @@ function EmployeeFiles() {
                               fileInput.click()
                             }}
                           >
-                            {file.isDeleted !== undefined ? 'Update' : ''}
+                            {file.isDeleted !== undefined ? (
+                              <FontAwesomeIcon icon={faPencilAlt} size='1x' color='black' />
+                            ) : (
+                              <FontAwesomeIcon icon={faUpload} size='1x' color='black' />
+                            )}
                           </button>
+                          {Object.keys(otherFiles).length === 0 && (
+                            <button type='button' className='btn'>
+                              <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                            </button>
+                          )}
                         </td>
-                        <td>
+                        <td style={{textAlign: 'right'}}>
                           <button
                             type='button'
                             className='btn'
@@ -471,7 +646,11 @@ function EmployeeFiles() {
                               preview_file(`otherFiles/${file.name}`)
                             }}
                           >
-                            {file.isDeleted === false ? 'Preview' : ''}
+                            {file.isDeleted === false ? (
+                              <FontAwesomeIcon icon={faEye} size='1x' color='black' />
+                            ) : (
+                              <FontAwesomeIcon icon={faBan} size='1x' color='gray' />
+                            )}
                           </button>
                         </td>
                       </tr>

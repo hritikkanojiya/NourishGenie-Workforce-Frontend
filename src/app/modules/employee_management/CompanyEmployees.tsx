@@ -49,7 +49,7 @@ function CompanyEmployees() {
 
   // Defining variables for the pagination part
   const [currentPage, setCurrentPage] = useState(1)
-  const recordsPerPage = 5
+  const recordsPerPage = 6
   const lastIndex = currentPage * recordsPerPage
   const firstIndex = lastIndex - recordsPerPage
   const records = employees.slice(firstIndex, lastIndex)
@@ -248,23 +248,19 @@ function CompanyEmployees() {
 
   const containerStyle = {
     gap: '20px',
-    marginRight: '40px',
+    margin: '40px',
   }
 
   //Style for search bar
   const searchBarStyle = {
-    padding: '10px',
     border: '1px solid #ccc',
     borderRadius: '5px',
     boxShadow: 'none',
-    width: '100%',
+    width: '80%',
     fontSize: '16px',
-    fontFamily: 'Arial, sans-serif',
-    color: '#333',
-    backgroundColor: '#fff',
-    backgroundImage: 'none',
     outline: 'none',
-    marginBottom: '10px',
+    margin: '4px',
+    padding: '12px',
   }
 
   // Defining functions for pagination
@@ -300,12 +296,19 @@ function CompanyEmployees() {
               className='btn btn-primary dropdown-toggle'
               type='button'
               data-toggle='dropdown'
-              onClick={toggleRecordsButton}
+              onClick={toggleMenu}
             >
               <FontAwesomeIcon icon={icon({name: 'filter'})} />
             </button>
             <div style={menuStyle} className='dropdown-menu dropdown-menu-sm dropdown-menu-right'>
               {/* Search input bar */}
+              <h6
+                className='dropdown-header'
+                style={{fontSize: '14px', color: 'black', margin: '4px'}}
+              >
+                Search Employees
+              </h6>
+              <hr className='dropdown-divider' style={{margin: '4px 0'}} />
               <input
                 type='search'
                 placeholder='Search Employees'
@@ -314,6 +317,13 @@ function CompanyEmployees() {
                   handleSearch(e)
                 }}
               />
+              <h6
+                className='dropdown-header'
+                style={{fontSize: '14px', color: 'black', margin: '4px', padding: '12px'}}
+              >
+                Filter Employees
+              </h6>
+              <hr className='dropdown-divider' style={{margin: '4px 0'}} />
               {/* Dropdown Content */}
               <select
                 style={selectStyle}
@@ -329,6 +339,7 @@ function CompanyEmployees() {
                   </option>
                 ))}
               </select>
+              <br />
               <select
                 style={selectStyle}
                 className='form-select form-select-lg form-select-solid'

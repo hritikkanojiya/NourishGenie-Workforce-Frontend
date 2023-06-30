@@ -7,43 +7,43 @@ import {useState} from 'react'
 import {useEffect} from 'react'
 import api from '../../../../app/modules/RequestConfig'
 const API_URL = process.env.REACT_APP_API_URL
-export const GET_USER_PROFILE = `${API_URL}/agent/account_files/get-profile-picture`
+export const GET_PROFILE_PICTURE = `${API_URL}/agent/account_files/get-profile`
 const itemClass = 'ms-1 ms-lg-3'
-const btnClass =
-  'btn btn-icon btn-custom btn-icon-muted btn-active-light btn-active-color-primary w-35px h-35px w-md-40px h-md-40px'
 const userAvatarClass = 'symbol-35px symbol-md-40px'
 const btnIconClass = 'svg-icon-1'
 
 const Navbar = () => {
-  // useEffect(() => {
-  //   getUserProfile()
-  // }, [])
   const [profilePicture, setProfilePicture] = useState('')
-
   const {config} = useLayout()
   const {currentUser} = useAuth()
-
   const first_name = currentUser?.username.split(' ')[0]
   const last_name = currentUser?.username.split(' ')[1]
 
+  useEffect(() => {
+    getUserProfile()
+  }, []) // this will either return a file or an error saying that the file does not exist.
   const getUserProfile = async () => {
-    const id = currentUser?.appAgentId
     const varToken = localStorage.getItem('token')
+    console.log(GET_PROFILE_PICTURE)
     if (varToken) {
       try {
         const result = await api.post(
-          GET_USER_PROFILE,
-          {attachmentId: id},
+          GET_PROFILE_PICTURE,
+          {
+            appAgentId: currentUser?.appAgentId,
+          },
           {
             headers: {
               genie_access_token: 'Bearer ' + varToken,
             },
           }
         )
-        console.log(result)
-        setProfilePicture(result.data.profilePicture)
-      } catch (err) {
-        console.log(err)
+
+        // Convert the Blob to a data URL
+        console.log(result.data.data)
+        setProfilePicture(`http://localhost:8000/${result.data.data.profile_picture}`)
+      } catch (error) {
+        setProfilePicture(`https://ui-avatars.com/api/?name=${first_name}+${last_name}`)
       }
     }
   }
@@ -90,9 +90,7 @@ const Navbar = () => {
           data-kt-menu-attach='parent'
           data-kt-menu-placement='bottom-end'
         >
-          {' '}
-          {}
-          <img src={`https://ui-avatars.com/api/?name=${first_name}+${last_name}`} alt='' />
+          <img src={profilePicture} alt='' />
         </div>
         <HeaderUserMenu />
       </div>
