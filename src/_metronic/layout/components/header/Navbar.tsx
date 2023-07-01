@@ -20,8 +20,10 @@ const Navbar = () => {
   const last_name = currentUser?.username.split(' ')[1]
 
   useEffect(() => {
-    getUserProfile()
-  }, []) // this will either return a file or an error saying that the file does not exist.
+    if (currentUser) {
+      getUserProfile()
+    }
+  }, [currentUser]) // this will either return a file or an error saying that the file does not exist.
   const getUserProfile = async () => {
     const varToken = localStorage.getItem('token')
     console.log(GET_PROFILE_PICTURE)

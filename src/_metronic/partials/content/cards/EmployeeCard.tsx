@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
 import {FC, useEffect, useState} from 'react'
-import {toAbsoluteUrl} from '../../../helpers'
 import {Link} from 'react-router-dom'
 import api from '../../../../app/modules/RequestConfig'
 const API_URL = process.env.REACT_APP_API_URL
@@ -32,7 +31,6 @@ const EmployeeCard: FC<Props> = ({
   const last_name = name.split(' ')[1]
   const getUserProfile = async () => {
     const varToken = localStorage.getItem('token')
-    console.log(GET_PROFILE_PICTURE)
     if (varToken) {
       try {
         const result = await api.post(
@@ -46,14 +44,12 @@ const EmployeeCard: FC<Props> = ({
             },
           }
         )
-        console.log(result.data.data)
         setProfilePicture(`http://localhost:8000/${result.data.data.profile_picture}`)
       } catch (error) {
         setProfilePicture(`https://ui-avatars.com/api/?name=${first_name}+${last_name}`)
       }
     }
   }
-  console.log(id)
   return (
     <div className='card'>
       <div className='card-body d-flex flex-center flex-column p-9'>
