@@ -39,7 +39,6 @@ const AppRoutes: FC = () => {
     }
   }, [token]) // Include 'token' as a dependency
 
-  console.log(token)
   useEffect(() => {
     const getUser = async () => {
       const varToken = localStorage.getItem('token')
@@ -50,7 +49,7 @@ const AppRoutes: FC = () => {
               genie_access_token: 'Bearer ' + varToken,
             },
           })
-
+          console.log(result.data)
           setCurrentUser(result.data.agent)
         } catch (err) {
           console.log(err)
@@ -58,7 +57,7 @@ const AppRoutes: FC = () => {
       }
     }
     getUser()
-  }, [token])
+  }, [])
   return (
     <BrowserRouter basename={PUBLIC_URL}>
       <Routes>

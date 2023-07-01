@@ -65,7 +65,7 @@ const ProfileCard = () => {
     date_of_birth: Yup.date()
       .nullable()
       .required('Date of Birth is required')
-      .test('age', 'Age must be greater than 10', (value) => {
+      .test('age', 'Age must be greater than 18', (value) => {
         if (value) {
           const today = new Date()
           const birthDate = new Date(value)
@@ -73,10 +73,10 @@ const ProfileCard = () => {
           const monthDiff = today.getMonth() - birthDate.getMonth()
 
           if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
-            return age - 1 > 10
+            return age - 1 > 18
           }
 
-          return age > 10
+          return age > 18
         }
 
         return true
@@ -103,7 +103,7 @@ const ProfileCard = () => {
     city: Yup.string().required('City is required'),
     address: Yup.string().required('Address is required'),
     landmark: Yup.string().required('Landmark is required'),
-    pincode: Yup.string().required('Pincode is required'),
+    pincode: Yup.string().required('Pincode is required').max(6).min(6),
     //       for (let i = 0; i < value.length; i++) {
     //         const file = value[i]
     //         if (!allowedFormats.includes(file.type)) {

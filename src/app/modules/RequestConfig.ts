@@ -5,7 +5,6 @@ export const REFRESH_TOKEN = `${API_URL}/agent/auth/refresh`
 
 const api = axios.create()
 function isTokenExpired() {
-  console.log('Hey')
   const currentTime = Date.now() / 1000
   const decodedToken: any = jwt_decode(localStorage.getItem('token') || '')
   if (decodedToken.exp < currentTime) {

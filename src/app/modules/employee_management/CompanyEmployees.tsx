@@ -34,28 +34,22 @@ export const DELETE_SINGLE_USER = `${API_URL}/agent/account/delete-agent`
 export const GET_ALL_DESIGNATIONS = `${API_URL}/agent/fields/designation/get-designation`
 export const GET_ALL_DEPARTMENTS = `${API_URL}/agent/fields/department/get-department`
 function CompanyEmployees() {
-  //State for dropdown
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  //State for the search bar
-  const [searchInputs, setSearchInputs] = useState([])
-
+  const [search, setSearch] = useState('')
   const [employees, setEmployees] = React.useState([])
   const [isLoading, setIsLoading] = React.useState(false)
   const [appDesignationId, setAppDesignationId] = React.useState<string | null>(null)
   const [appDepartmentId, setAppDepartmentId] = React.useState<string | null>(null)
   const [designations, setDesignations] = React.useState([])
   const [departments, setDepartments] = React.useState([])
+  const [totalRecords, setTotalRecords] = React.useState(0)
 
   // Defining variables for the pagination part
+
   const [currentPage, setCurrentPage] = useState(1)
-  const recordsPerPage = 6
+  const [recordsPerPage, setRecordsPerPage] = useState(10)
   const lastIndex = currentPage * recordsPerPage
   const firstIndex = lastIndex - recordsPerPage
-  const records = employees.slice(firstIndex, lastIndex)
-  const noOfPages = Math.ceil(employees.length / recordsPerPage)
-
-  //api calling
   useEffect(() => {
     ;(async () => {
       await load_Designations()
@@ -63,21 +57,31 @@ function CompanyEmployees() {
     })()
   }, [])
 
+  function handleSearch(searchValue: string) {
+    setSearch(searchValue)
+  }
+
   useEffect(() => {
     ;(async () => {
       await Load()
     })()
-  }, [appDesignationId, appDepartmentId])
+  }, [appDesignationId, appDepartmentId, currentPage, search, recordsPerPage])
 
   async function Load(parameter?: any) {
     setIsLoading(true)
     const varToken = localStorage.getItem('token')
-    console.log(varToken)
     const result = await api.post(
       GET_ALL_USERS,
       {
         appDesignationId: appDesignationId,
         appDepartmentId: appDepartmentId,
+        search: search ? search : null,
+        metaData: {
+          sortBy: null,
+          sortOn: null,
+          limit: recordsPerPage,
+          offset: search ? null : recordsPerPage * (currentPage - 1),
+        },
       },
       {
         headers: {
@@ -86,6 +90,7 @@ function CompanyEmployees() {
       }
     )
     setEmployees(result.data.data.AppUsers)
+    setTotalRecords(result.data.data.metaData.total_records)
     setIsLoading(false)
   }
   async function DeleteSingleUser(id: any) {
@@ -102,7 +107,6 @@ function CompanyEmployees() {
         },
       }
     )
-    console.log(result)
     if (result.data.error === false) {
       await Load()
     }
@@ -175,59 +179,28 @@ function CompanyEmployees() {
 
   // Employee Card Function
   // const employeeCards = employees.map((employee: any) => {
-  const employeeCards =
-    searchInputs.length === 0
-      ? records.map((employee: any) => {
-          return (
-            <div key={employee.appAgentId} className='col-md-6 col-xxl-4'>
-              <EmployeeCard
-                avatar='/media/avatars/300-25.jpg'
-                name={employee.first_name + ' ' + employee.last_name}
-                employeeType={employee.employee_type}
-                id={employee.appAgentId}
-                DeleteSingleUser={DeleteSingleUser}
-              />
-            </div>
-          )
-        })
-      : searchInputs.map((employee: any) => {
-          return (
-            <div key={employee.appAgentId} className='col-md-6 col-xxl-4'>
-              <EmployeeCard
-                avatar='/media/avatars/300-25.jpg'
-                name={employee.first_name + ' ' + employee.last_name}
-                employeeType={employee.employee_type}
-                id={employee.appAgentId}
-                DeleteSingleUser={DeleteSingleUser}
-              />
-            </div>
-          )
-        })
-
-  // Function for filtering out the seach results and storing it in the searchInputs state.
-  const handleSearch = (e: any = true) => {
-    let arr = employees.filter((emp: any = true) => {
-      if (e.target.value !== '' && e.target.value !== ' ') {
-        let name = emp.first_name + ' ' + emp.last_name
-        return name.toLowerCase().includes(e.target.value.toLowerCase())
-      }
-      return false
-    })
-
-    setSearchInputs(arr)
-  }
+  const employeeCards = employees.map((employee: any) => {
+    return (
+      <div key={employee.appAgentId} className='col-md-6 col-xxl-4'>
+        <EmployeeCard
+          avatar='/media/avatars/300-25.jpg'
+          name={employee.first_name + ' ' + employee.last_name}
+          employeeType={employee.employee_type}
+          id={employee.appAgentId}
+          DeleteSingleUser={DeleteSingleUser}
+        />
+      </div>
+    )
+  })
 
   // Style for dropdown
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
   }
-
-  const toggleRecordsButton = () => {
-    //Implement the functionality for toggling the records button
-  }
-
-  const dropdownStyle = {
+  const dropdownStyle: any = {
     display: 'inline-block',
+    position: 'relative',
+    zIndex: '1',
   }
   const buttonStyle = {
     padding: '0.5rem 1rem',
@@ -235,32 +208,14 @@ function CompanyEmployees() {
     lineHeight: '1.5',
   }
 
-  const menuStyle = {
+  const menuStyle: any = {
     display: isMenuOpen ? 'block' : 'none',
     minWidth: 'auto',
     padding: '0',
-  }
-
-  const selectStyle = {
-    borderRadius: '0',
-    fontSize: '14px',
-  }
-
-  const containerStyle = {
-    gap: '20px',
-    margin: '40px',
-  }
-
-  //Style for search bar
-  const searchBarStyle = {
-    border: '1px solid #ccc',
-    borderRadius: '5px',
-    boxShadow: 'none',
-    width: '80%',
-    fontSize: '16px',
-    outline: 'none',
-    margin: '4px',
-    padding: '12px',
+    position: 'absolute',
+    top: '100%',
+    right: '0',
+    zIndex: '2',
   }
 
   // Defining functions for pagination
@@ -272,100 +227,148 @@ function CompanyEmployees() {
     <>
       <PageTitle breadcrumbs={permissionsBreadCrumbs}>Company Employees</PageTitle>
 
-      <div className='d-flex flex-wrap flex-stack mb-6'>
+      <div className='d-flex   flex-wrap flex-stack mb-6'>
         {/* Showing the number of employees on page */}
-        <div className='d-flex justify-content-start fs-6 fw-bold text-gray-700'>
-          Showing {firstIndex + 1} to {lastIndex <= employees.length ? lastIndex : employees.length}{' '}
-          of {employees.length} Employees
-          <button
-            style={buttonStyle}
-            className='btn btn-primary-sm dropdown-toggle'
-            type='button'
-            data-toggle='dropdown'
-            onClick={toggleRecordsButton}
-          ></button>
+        <div style={{display: 'grid'}}>
+          <div className='d-flex justify-content-start fs-6 fw-bold text-gray-700'>
+            Showing {firstIndex + 1} to {lastIndex <= totalRecords ? lastIndex : totalRecords} of{' '}
+            {totalRecords} Employees
+          </div>
+          {/* Dropdown menu to display records */}
+          <select
+            className='form-select form-select-solid mx-2'
+            style={{width: '180px', marginTop: '10px', backgroundColor: '#ececec'}}
+            data-kt-select2='true'
+            data-placeholder='Show records'
+            value={recordsPerPage}
+            onChange={(e: any) => {
+              console.log(e.target.value)
+              setRecordsPerPage(e.target.value)
+            }}
+          >
+            <option value={10}>10 Records</option>
+            <option value={15}>15 Records</option>
+            <option value={25}>25 Records</option>
+            <option value={50}>50 Records</option>
+          </select>
         </div>
         {/* Dropdown menu for filter */}
-        <div
-          className='d-flex justify-content-end flex-wrap flex-stack mb-6'
-          style={containerStyle}
-        >
-          <div style={dropdownStyle}>
-            <button
-              style={buttonStyle}
-              className='btn btn-primary dropdown-toggle'
-              type='button'
-              data-toggle='dropdown'
-              onClick={toggleMenu}
-            >
-              <FontAwesomeIcon icon={icon({name: 'filter'})} />
-            </button>
-            <div style={menuStyle} className='dropdown-menu dropdown-menu-sm dropdown-menu-right'>
-              {/* Search input bar */}
-              <h6
-                className='dropdown-header'
-                style={{fontSize: '14px', color: 'black', margin: '4px'}}
+        <div className='d-flex justify-content-start flex-wrap flex-stack mb-6'>
+          <div style={{display: 'flex'}}>
+            <div style={dropdownStyle}>
+              <button
+                style={buttonStyle}
+                className='btn btn-primary dropdown-toggle'
+                type='button'
+                data-toggle='dropdown'
+                onClick={toggleMenu}
               >
-                Search Employees
-              </h6>
-              <hr className='dropdown-divider' style={{margin: '4px 0'}} />
-              <input
-                type='search'
-                placeholder='Search Employees'
-                style={searchBarStyle}
-                onChange={(e) => {
-                  handleSearch(e)
-                }}
-              />
-              <h6
-                className='dropdown-header'
-                style={{fontSize: '14px', color: 'black', margin: '4px', padding: '12px'}}
-              >
-                Filter Employees
-              </h6>
-              <hr className='dropdown-divider' style={{margin: '4px 0'}} />
-              {/* Dropdown Content */}
-              <select
-                style={selectStyle}
-                className='form-select form-select-lg form-select-solid'
-                onChange={(e) => {
-                  setAppDesignationId(e.target.value !== 'null' ? e.target.value : null)
-                }}
-              >
-                <option value={'null'}>Filter Employees Designation</option>
-                {designations.map((dn: any) => (
-                  <option key={dn.appDesignationId} value={dn.appDesignationId}>
-                    {dn.name}
-                  </option>
-                ))}
-              </select>
-              <br />
-              <select
-                style={selectStyle}
-                className='form-select form-select-lg form-select-solid'
-                onChange={(e) => {
-                  setAppDepartmentId(e.target.value !== 'null' ? e.target.value : null)
-                }}
-              >
-                <option value={'null'}>Filter Employees Department</option>
-                {departments.map((dn: any) => (
-                  <option key={dn.appDepartmentId} value={dn.appDepartmentId}>
-                    {dn.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+                Filter
+                <FontAwesomeIcon icon={icon({name: 'filter'})} />
+              </button>
+              {isMenuOpen && (
+                <div
+                  style={menuStyle}
+                  className='menu menu-sub menu-sub-dropdown w-250px w-md-300px'
+                  data-kt-menu='true'
+                >
+                  <div className='px-7 py-5'>
+                    <div className='fs-5 text-dark fw-bolder'>Search Employees:</div>
+                    <div className='py-3'>
+                      <div className='form-group'>
+                        <input
+                          type='text'
+                          className='form-control form-control-solid fw-bold ps-10'
+                          placeholder='Search Employees'
+                          onChange={(e: any) => {
+                            handleSearch(e.target.value)
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className='px-7 py-5'>
+                    <div className='fs-5 text-dark fw-bolder'>Filter Options</div>
+                  </div>
 
-          {/* Create New Genie Button */}
-          <Link
-            to={'/crafted/employee_management/create-employee'}
-            className='btn btn-primary btn-sm'
-            data-bs-toggle='tooltip'
-            title='Coming soon'
-          >
-            Create a new Genie
-          </Link>
+                  <div className='separator border-gray-200'></div>
+
+                  <div className='px-7 py-5'>
+                    <div className='mb-10'>
+                      <label className='form-label fw-bold'>Filter Employees By Department:</label>
+
+                      <div>
+                        <select
+                          className='form-select form-select-solid'
+                          data-kt-select2='true'
+                          data-placeholder='Select option'
+                          data-allow-clear='true'
+                          onChange={(e) => {
+                            setAppDepartmentId(e.target.value !== 'null' ? e.target.value : null)
+                          }}
+                        >
+                          <option value={'null'}>Filter by Department</option>
+                          {departments.map((dn: any) => (
+                            <option key={dn.appDepartmentId} value={dn.appDepartmentId}>
+                              {dn.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div className='mb-10'>
+                      <label className='form-label fw-bold'>Filter Employees By Designation:</label>
+
+                      <div>
+                        <select
+                          className='form-select form-select-solid'
+                          data-kt-select2='true'
+                          data-placeholder='Select option'
+                          data-allow-clear='true'
+                          onChange={(e) => {
+                            setAppDesignationId(e.target.value !== 'null' ? e.target.value : null)
+                          }}
+                        >
+                          <option value={'null'}>Filter by Designation</option>
+                          {designations.map((dn: any) => (
+                            <option key={dn.appDesignationId} value={dn.appDesignationId}>
+                              {dn.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <div className='d-flex justify-content-end'>
+                      <button
+                        type='reset'
+                        className='btn btn-sm btn-light btn-active-light-primary me-2'
+                        data-kt-menu-dismiss='true'
+                        onClick={() => {
+                          setAppDepartmentId(null)
+                          setAppDesignationId(null)
+                          setSearch('')
+                          toggleMenu()
+                        }}
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+            {/* Create New Genie Button */}
+
+            <Link
+              style={{marginLeft: '10px'}}
+              to={'/crafted/employee_management/create-employee'}
+              className='btn btn-primary btn-sm'
+              data-bs-toggle='tooltip'
+            >
+              Create a new Genie
+            </Link>
+          </div>
         </div>
       </div>
       {isLoading ? (
@@ -390,18 +393,14 @@ function CompanyEmployees() {
         </>
       )}
       {/* Pagination Component */}
-      {/* https://www.npmjs.com/package/react-paginate */}
       <ReactPaginate
         previousLabel={'<'}
         nextLabel={'>'}
         breakLabel={'...'}
-        pageCount={noOfPages}
-        // No of pages diplayed at the start and end of the pagination
+        pageCount={Math.ceil(totalRecords / recordsPerPage)}
         marginPagesDisplayed={2}
-        // No of pages displayed at the end of the pagination
         pageRangeDisplayed={3}
         onPageChange={changeCurrentPage}
-        // Styling
         containerClassName={'pagination justify-content-end'}
         pageClassName={'page-item'}
         pageLinkClassName={'page-link'}
