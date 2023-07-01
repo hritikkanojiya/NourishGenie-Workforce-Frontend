@@ -282,7 +282,7 @@ function CompanyEmployees() {
             className='btn btn-primary-sm dropdown-toggle'
             type='button'
             data-toggle='dropdown'
-            onClick={toggleMenu}
+            onClick={toggleRecordsButton}
           ></button>
         </div>
         {/* Dropdown menu for filter */}

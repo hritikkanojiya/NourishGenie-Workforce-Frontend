@@ -57,16 +57,16 @@ const AuthProvider: FC<WithChildren> = ({children}) => {
     const URL = LOGOUT_URL
     const varToken = localStorage.getItem('token')
     try {
-      // const result = await axios.post(
-      //   URL,
-      //   {},
-      //   {
-      //     headers: {
-      //       genie_access_token: 'Bearer ' + varToken,
-      //     },
-      //   }
-      // )
-      // console.log(result)
+      const result = await axios.post(
+        URL,
+        {},
+        {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        }
+      )
+      console.log(result)
     } catch (err) {
       console.log(err)
     } finally {
@@ -95,10 +95,10 @@ const AuthInit: FC<WithChildren> = ({children}) => {
     const requestUser = async (apiToken: string) => {
       try {
         if (!didRequest.current) {
-          const {data} = await getUserByToken(apiToken)
-          if (data) {
-            setCurrentUser(data)
-          }
+          // const {data} = await getUserByToken(apiToken)
+          // if (data) {
+          //   setCurrentUser(data)
+          // }
         }
       } catch (error) {
         console.error(error)

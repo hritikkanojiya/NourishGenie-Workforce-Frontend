@@ -38,6 +38,9 @@ const PrivateRoutes = () => {
   const CreateActions = lazy(() => import('../modules/employee_management/CreateActions'))
   const FileActions = lazy(() => import('../modules/employee_management/FileActions'))
 
+  // Employee Workpage route
+  const EmployeeWorkPage = lazy(() => import('../modules/employee_management/EmployeeWorkPage'))
+
   return (
     <Routes>
       <Route element={<MasterLayout />}>
@@ -135,6 +138,14 @@ const PrivateRoutes = () => {
           element={
             <SuspensedView>
               <EditEmployeeDetails />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='crafted/employee_management/employee-workpage/*'
+          element={
+            <SuspensedView>
+              <EmployeeWorkPage />
             </SuspensedView>
           }
         />
