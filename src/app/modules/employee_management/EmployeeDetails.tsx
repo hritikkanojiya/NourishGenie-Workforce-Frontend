@@ -34,7 +34,7 @@ function EmployeeDetails() {
       const result = await api.post(
         GET_USER_DETAILS,
         {
-          appAgentId: id,
+          appUserId: id,
         },
         {
           headers: {
@@ -136,12 +136,12 @@ function EmployeeDetails() {
                         color: 'black',
                         fontSize: '1.2em',
                       }}
-                      htmlFor='appAgentIdOfDepartment'
+                      htmlFor='appUserIdOfDepartment'
                     >
                       Department Id:
                     </label>
                     <span style={{marginLeft: '8px', fontSize: '1.2em'}}>
-                      {details.user_details ? details.user_details.appAgentIdOfDepartment : ''}
+                      {details.user_details ? details.user_details.appUserIdOfDepartment : ''}
                     </span>
                   </div>
                 </div>
@@ -649,7 +649,7 @@ function EmployeeDetails() {
                       <span style={{marginLeft: '8px', fontSize: '1.2em'}}>
                         {details.user_details
                           ? details.user_details.appReportingManagerId
-                            ? details.user_details.appReportingManagerId.appAgentId.email
+                            ? details.user_details.appReportingManagerId.appUserId.email
                             : 'No Manager Assigned'
                           : ''}
                       </span>

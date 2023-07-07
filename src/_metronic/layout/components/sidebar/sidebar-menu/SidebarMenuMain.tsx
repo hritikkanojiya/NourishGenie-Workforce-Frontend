@@ -42,6 +42,10 @@ const SidebarMenuMain = () => {
           to={'crafted/employee_management/employee-workpage'}
           title={'Employee Workpage'}
         ></SidebarMenuItem>
+        <SidebarMenuItem
+          to={'crafted/employee_management/employee-attendance'}
+          title={'Attendance Page'}
+        ></SidebarMenuItem>
       </SidebarMenuItemWithSub>
 
       <SidebarMenuItemWithSub title={'Company Fields'} to={''}>

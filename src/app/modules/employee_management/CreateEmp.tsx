@@ -1174,7 +1174,7 @@ const ProfileCard = () => {
                           <option value=''>Select Reporting Manager</option>
                           {reportingManagers.map((manager: any) => (
                             <option key={manager.appManagerId} value={manager.appManagerId}>
-                              {manager.appAgentId.email ? manager.appAgentId.email : 'No email'}
+                              {manager.appUserId.email ? manager.appUserId.email : 'No email'}
                             </option>
                           ))}
                         </select>

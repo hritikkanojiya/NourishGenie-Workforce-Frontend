@@ -99,7 +99,7 @@ function CompanyEmployees() {
     const result = await api.post(
       DELETE_SINGLE_USER,
       {
-        appAgentId: id,
+        appUserId: id,
       },
       {
         headers: {
@@ -186,7 +186,7 @@ function CompanyEmployees() {
           avatar='/media/avatars/300-25.jpg'
           name={employee.first_name + ' ' + employee.last_name}
           employeeType={employee.employee_type}
-          id={employee.appAgentId}
+          id={employee.appUserId}
           DeleteSingleUser={DeleteSingleUser}
         />
       </div>

@@ -41,6 +41,9 @@ const PrivateRoutes = () => {
   // Employee Workpage route
   const EmployeeWorkPage = lazy(() => import('../modules/employee_management/EmployeeWorkPage'))
 
+  // Attendance Page Route
+  const AttendancePage = lazy(() => import('../modules/employee_management/AttendancePage'))
+
   return (
     <Routes>
       <Route element={<MasterLayout />}>
@@ -146,6 +149,14 @@ const PrivateRoutes = () => {
           element={
             <SuspensedView>
               <EmployeeWorkPage />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='crafted/employee_management/employee-attendance/*'
+          element={
+            <SuspensedView>
+              <AttendancePage />
             </SuspensedView>
           }
         />

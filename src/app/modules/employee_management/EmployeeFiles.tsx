@@ -76,7 +76,7 @@ function EmployeeFiles() {
   async function update_file(file: any, file_id: any, field_name: string) {
     const id: any = location.state
     const formData = new FormData()
-    formData.append('appAgentId', id)
+    formData.append('appUserId', id)
 
     formData.append(field_name, file_id)
     if (field_name === 'profile_pictureId') {
@@ -121,7 +121,7 @@ function EmployeeFiles() {
   async function update_single_file(file: any, file_id: any, field_name: string) {
     const id: any = location.state
     const formData = new FormData()
-    formData.append('appAgentId', id)
+    formData.append('appUserId', id)
 
     if (field_name === 'profile_pictureId') {
       formData.append('profile_picture', file)
@@ -179,7 +179,7 @@ function EmployeeFiles() {
       const result = await api.post(
         GET_ALL_FILES,
         {
-          appAgentId: id,
+          appUserId: id,
         },
         {
           headers: {
