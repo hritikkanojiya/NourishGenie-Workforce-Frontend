@@ -11,6 +11,8 @@ import DesignaitonContextProvider from '../modules/company_fields/context/Design
 import ReportingManagerContextProvider from '../modules/company_fields/context/ReportingManagerContext'
 import DynamicFieldsContextProvider from '../modules/employee_management/FieldsContext'
 import FilesContextProvider from '../modules/employee_management/FilesContext'
+import CreateTicketMain from '../modules/tickets/CreatedTicket/CreateTicketMain';
+import MyTicketMain from '../modules/tickets/MyTicket/MyTicketMain';
 
 const PrivateRoutes = () => {
   //permission routes
@@ -50,7 +52,7 @@ const PrivateRoutes = () => {
           element={<Navigate to='/crafted/employee_management/company-employees' />}
         />
         {/* Pages */}
-        {/* <Route path='dashboard' element={<DashboardWrapper />} /> */}
+        {/* <Route path='dashboard' element={<DashboardWrapper />} /> */}u
         <Route path='builder' element={<BuilderPageWrapper />} />
         <Route path='menu-test' element={<MenuTestPage />} />
         {/* Lazy Modules */}
@@ -176,6 +178,22 @@ const PrivateRoutes = () => {
               <ReportingManagerContextProvider>
                 <ReportingManagerActions />
               </ReportingManagerContextProvider>
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='createticketmain/*'
+          element={
+            <SuspensedView>
+              <CreateTicketMain />
+            </SuspensedView>
+          }
+        />
+        <Route
+          path='myticketmain/*'
+          element={
+            <SuspensedView>
+              <MyTicketMain />
             </SuspensedView>
           }
         />

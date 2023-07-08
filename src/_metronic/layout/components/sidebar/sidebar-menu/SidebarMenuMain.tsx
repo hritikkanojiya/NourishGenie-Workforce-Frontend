@@ -58,6 +58,17 @@ const SidebarMenuMain = () => {
           title={'Reporting Managers'}
         ></SidebarMenuItem>
       </SidebarMenuItemWithSub>
+
+      <SidebarMenuItemWithSub title={'Resolve Fields'} to={''}>
+        <SidebarMenuItem
+          to={'createticketmain'}
+          title={'Created Ticket'}
+        ></SidebarMenuItem>
+        <SidebarMenuItem
+          to={'myticketmain'}
+          title={'My Ticket'}
+        ></SidebarMenuItem>
+      </SidebarMenuItemWithSub>
     </>
   )
 }
