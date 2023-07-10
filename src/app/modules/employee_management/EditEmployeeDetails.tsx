@@ -126,7 +126,7 @@ const EditEmployeeDetails: React.FC = () => {
       const result = await api.post(
         GET_USER_DETAILS,
         {
-          appAgentId: id,
+          appUserId: id,
         },
         {
           headers: {
@@ -248,7 +248,7 @@ const EditEmployeeDetails: React.FC = () => {
         GET_ALL_MANAGERS,
         {
           appManagerId: null,
-          appAgentId: null,
+          appUserId: null,
           metaData: {
             sortBy: null,
             sortOn: null,
@@ -429,7 +429,7 @@ const EditEmployeeDetails: React.FC = () => {
         const res = await api.put(
           url,
           {
-            appAgentId: id,
+            appUserId: id,
             //personal information
             first_name: values.first_name,
             last_name: values.last_name,
@@ -1115,7 +1115,7 @@ const EditEmployeeDetails: React.FC = () => {
                               <option value=''>Select Reporting Manager</option>
                               {managers.map((manager: any) => (
                                 <option key={manager.appManagerId} value={manager.appManagerId}>
-                                  {manager.appAgentId.email}
+                                  {manager.appUserId.email}
                                 </option>
                               ))}
                             </select>

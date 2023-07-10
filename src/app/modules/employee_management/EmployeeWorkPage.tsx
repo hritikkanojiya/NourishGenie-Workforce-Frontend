@@ -14,11 +14,22 @@ function EmployeeWorkPage() {
   const employeeTypes = ['Permanent', 'Internship', 'Part-time', 'Freelancer']
 
   const loadAllEmployees = async (s: any = null, e: any = null) => {
+    const varToken = localStorage.getItem('token')
+    console.log('Token = ', varToken)
+
     try {
-      const data = await api.post(LOAD_ALL_EMPLOYEES, {
-        search: s !== '' ? s : null,
-        employeeType: e !== 'null' ? e : null,
-      })
+      const data = await api.post(
+        LOAD_ALL_EMPLOYEES,
+        {
+          search: s !== '' ? s : null,
+          employeeType: e !== 'null' ? e : null,
+        },
+        {
+          headers: {
+            genie_access_token: 'Bearer ' + varToken,
+          },
+        }
+      )
       console.log('Data = ', data.data)
       console.log('Logged in Users = ', data.data.data.loggedInUsers)
       console.log('Break in users = ', data.data.data.breakInUsers)
