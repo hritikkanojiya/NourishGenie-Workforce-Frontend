@@ -40,7 +40,9 @@ import {
     onChangeSortObj,
     sortObj,
 } from "../../common/globals/common.constants";
+import api from '../../RequestConfig'
 const API_URL = process.env.REACT_APP_API_URL;
+const GET_USER_BY_TOKEN = `${API_URL}/agent/auth/getAgentByToken`
 
 const ariaLabel = {
     'aria-label': 'description',
@@ -90,7 +92,7 @@ const MyTicketMain = () => {
         sortOn: null,
     });
 
-    const userId = "649870a70543ab78d34e3dab"
+    const userIdRef = useRef("");
 
     const [userOptions, setUserOptions] = useState([{ value: "", label: "" }]);
     const [selectedOptions, setSelectedOptions] = useState([{ value: "", label: "" }]);
@@ -122,7 +124,7 @@ const MyTicketMain = () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                From: userId,
+                From: userIdRef.current,
                 page: page,
                 limit: limit,
                 sortOn: sortState.sortOn,
@@ -179,13 +181,13 @@ const MyTicketMain = () => {
     }
 
     const sortOnlyPriority = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-        const response = await fetch(`${API_URL}/ticketroutes/all_category_ticket`, {
+        const response = await fetch(`${API_URL}/ticketroutes/all_my_sort_ticket`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                From: userId,
+                To: userIdRef.current,
                 ticketPriorityId: e.target.value,
                 ticketStatusId: "",
                 page: page,
@@ -197,13 +199,13 @@ const MyTicketMain = () => {
         setAllTicket(json.all_category_ticket);
     }
     const sortPriority = async (page: number, limit: number) => {
-        const response = await fetch(`${API_URL}/ticketroutes/all_category_ticket`, {
+        const response = await fetch(`${API_URL}/ticketroutes/all_my_sort_ticket`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                From: userId,
+                To: userIdRef.current,
                 ticketPriorityId: sortpriority,
                 ticketStatusId: sortstatus,
                 page: page,
@@ -249,14 +251,14 @@ const MyTicketMain = () => {
         // e.preventDefault();
         let searchValue = svalue.search;
         const response = await fetch(
-            `${API_URL}/ticketroutes/all_search_ticket`,
+            `${API_URL}/ticketroutes/all_search_my_ticket`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    From: userId,
+                    To: userIdRef.current,
                     searchValue: svalue,
                     page: paginationState.page,
                     limit: paginationState.itemsPerPage
@@ -381,9 +383,17 @@ const MyTicketMain = () => {
 
     const getAllUser = async () => {
 
+        console.log(userIdRef.current, "userIdRef.currentUP");
         const response = await fetch(`${API_URL}/ticketroutes/get_user`, {
-            method: 'Get'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                loginUserId: userIdRef.current
+            })
         });
+        console.log(userIdRef.current, "userIdRef.current");
         const json = await response.json()
         const already_user = new Map();
         for (let i = 0; i < json.allUsers.length; i++) {
@@ -458,7 +468,7 @@ const MyTicketMain = () => {
                 },
                 body: JSON.stringify({
                     ticket_id: currentTicketId,
-                    transferBy: userId,
+                    transferBy: userIdRef.current,
                     transferTo: transferUserId
                 })
             }
@@ -505,25 +515,7 @@ const MyTicketMain = () => {
     }
 
     const [authUser, setAuthUser] = useState(true)
-    const verify_user = async () => {
-        const response = await fetch(
-            `${API_URL}/auth/user/verify_user`,
-            {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    userId: userId
-                })
-            }
-        );
-        const json = await response.json();
-        if (json.message !== 'success') {
-            showToast(json.error.message, "error");
-            setAuthUser(false);
-        }
-    }
+   
 
     const searchStatus = (e: any) => {
         let str = e.target.value;
@@ -536,9 +528,23 @@ const MyTicketMain = () => {
     }
 
     useEffect(() => {
-        // verify_user();
-        getAllUser();
-        getAllTicket(1, 10)
+        const set_user_id = async () => {
+            const varToken = localStorage.getItem('token')
+            try {
+              const result = await api.get(GET_USER_BY_TOKEN, {
+                headers: {
+                  genie_access_token: 'Bearer ' + varToken,
+                },
+              })
+              console.log(result.data.User.appUserId, "result.data");
+              userIdRef.current = result.data.User.appUserId;
+              getAllUser();
+              getAllTicket(1, 10)
+            } catch (err: any) {
+              console.log(err);
+            }
+        }
+        set_user_id();
     }, [
         sortState.sortOn,
         sortState.sortBy,

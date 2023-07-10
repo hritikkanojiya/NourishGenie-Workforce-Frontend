@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,11 +9,13 @@ import Select from 'react-select';
 import axios from "axios";
 import { showToast } from "../../common/toastify/toastify.config";
 import { ToastContainer, toast } from "react-toastify";
+import api from '../../RequestConfig';
 import { useNavigate } from 'react-router-dom';
 import {
     user_id
     } from './modals/create_ticket';
 const API_URL = process.env.REACT_APP_API_URL;
+const GET_USER_BY_TOKEN = `${API_URL}/agent/auth/getAgentByToken`
 const FormData = require("form-data");
 
 const initialValues = {
@@ -67,6 +69,8 @@ const CreateNewTicket = (props: user_id) => {
         setState({ ...state, [side]: open });
     };
 
+    const userIdRef = useRef("");
+
     // let userOptions = [{ value: '', label: '' }];
     const [userOptions, setUserOptions] = useState([{ value: "", label: "" }]);
     const [myfile, setMyfile] = useState({ attachFile: { name: '', size: 0 } });
@@ -85,7 +89,7 @@ const CreateNewTicket = (props: user_id) => {
                         return;
                     }
                     formdata.append('myfile', myfile.attachFile, myfile.attachFile.name);
-                    formdata.append('From', props.loginUserId);
+                    formdata.append('From', userIdRef.current);
                     let url = `${API_URL}/ticketroutes/upload_file`;
                     try {
                         response1 = await axios.post(url, formdata);
@@ -112,7 +116,7 @@ const CreateNewTicket = (props: user_id) => {
                     body: JSON.stringify({
                         subject: values.subject,
                         content: values.content,
-                        From: props.loginUserId,
+                        From: userIdRef.current,
                         To: all_send_to,
                         appTicketPriorityId: values.priority,
                         appTicketCategoryId: values.category,
@@ -186,9 +190,16 @@ const CreateNewTicket = (props: user_id) => {
     const getAllUser = async () => {
 
         const response = await fetch(`${API_URL}/ticketroutes/get_user`, {
-            method: 'Get'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                loginUserId: userIdRef.current
+            })
         });
         const json = await response.json()
+        console.log(json, "json");
         setUserOptions(json.allUsers);
     }
 
@@ -321,10 +332,25 @@ const CreateNewTicket = (props: user_id) => {
     );
 
     useEffect(() => {
-        getAllPriority();
-        getAllCategory();
-        getAllStatus();
-        getAllUser();
+        const set_user_id = async () => {
+            const varToken = localStorage.getItem('token')
+            try {
+              const result = await api.get(GET_USER_BY_TOKEN, {
+                headers: {
+                  genie_access_token: 'Bearer ' + varToken,
+                },
+              })
+              console.log(result.data.User.appUserId, "result.data1");
+              userIdRef.current = result.data.User.appUserId;
+              getAllPriority();
+              getAllCategory();
+              getAllStatus();
+              getAllUser();
+            } catch (err: any) {
+              console.log(err);
+            }
+        }
+        set_user_id();
     }, [])
     return (
         <>

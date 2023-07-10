@@ -20,6 +20,7 @@ import { ToastContainer } from "react-toastify";
 import { BiRefresh } from 'react-icons/bi';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import Tooltip from '@mui/material/Tooltip';
+import api from '../../RequestConfig';
 import {
     prev_state, 
     pagination_prev_state
@@ -29,6 +30,7 @@ import {
     sortObj,
 } from "../../common/globals/common.constants";
 const API_URL = process.env.REACT_APP_API_URL;
+const GET_USER_BY_TOKEN = `${API_URL}/agent/auth/getAgentByToken`
 
 const useStyles = makeStyles(theme => ({
     margin: {
@@ -61,10 +63,11 @@ const Home = () => {
         sortOn: null,
     });
 
-    const userId = "649870a70543ab78d34e3dab"
+    // const [userId, setUserId] = useState("");
+    const userIdRef = useRef("");
 
     const [idsdetail, setIdsdetail] = useState({
-        sender_id: userId,
+        sender_id: userIdRef.current,
         reciever_id: [],
         setUser: false
     });
@@ -99,7 +102,7 @@ const Home = () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                From: userId,
+                From: userIdRef.current,
                 page: page,
                 limit: limit,
                 sortOn: sortState.sortOn,
@@ -167,7 +170,7 @@ const Home = () => {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                From: userId,
+                From: userIdRef.current,
                 ticketPriorityId: sortpriority,
                 ticketStatusId: sortstatus,
                 page: page,
@@ -218,7 +221,7 @@ const Home = () => {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    From: userId,
+                    From: userIdRef.current,
                     searchValue: svalue,
                     page: paginationState.page,
                     limit: paginationState.itemsPerPage
@@ -354,7 +357,13 @@ const Home = () => {
     const getAllUser = async () => {
 
         const response = await fetch(`${API_URL}/ticketroutes/get_user`, {
-            method: 'Get'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                loginUserId: userIdRef.current
+            })
         });
         const json = await response.json()
         const already_user = new Map();
@@ -405,20 +414,35 @@ const Home = () => {
 
     const [authUser, setAuthUser] = useState(true)
     const verify_user = async () => {
+        //setUserId
         const varToken = localStorage.getItem('token');
         console.log(varToken, "varToken");
         const response = await fetch(
-            `${API_URL}/auth/user/verify_user`,
+            `${API_URL}/agent/auth/getAgentByToken`,
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    userId: userId
+                    userId: userIdRef.current
                 })
             }
         );
+        // const varToken = localStorage.getItem('token');
+        // console.log(varToken, "varToken");
+        // const response = await fetch(
+        //     `${API_URL}/auth/user/verify_user`,
+        //     {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //         },
+        //         body: JSON.stringify({
+        //             userId: userIdRef.current
+        //         })
+        //     }
+        // );
         const json = await response.json();
         if (json.message !== 'success') {
             showToast(json.error.message, "error");
@@ -438,9 +462,25 @@ const Home = () => {
     }
 
     useEffect(() => {
-        // verify_user();
-        getAllUser();
-        getAllTicket(1, 10);
+        const set_user_id = async () => {
+            const varToken = localStorage.getItem('token')
+            try {
+              const result = await api.get(GET_USER_BY_TOKEN, {
+                headers: {
+                  genie_access_token: 'Bearer ' + varToken,
+                },
+              })
+              console.log(result.data.User.appUserId, "result.data");
+              userIdRef.current = result.data.User.appUserId;
+              getAllUser();
+              getAllTicket(1, 10)
+            } catch (err: any) {
+              console.log(err);
+            }
+        }
+        set_user_id();
+        // getAllUser();
+        // getAllTicket(1, 10);
     }, [
         sortState.sortOn,
         sortState.sortBy,
@@ -588,7 +628,7 @@ const Home = () => {
                                         </div>
                                     </div>}
                                 </div>
-                                <CreateTicket loginUserId={userId} />
+                                <CreateTicket loginUserId={userIdRef.current} />
                             </div>
 
                         </div>
@@ -745,7 +785,7 @@ const Home = () => {
                                     <td className="text-center">
                                         <Tooltip title="Send Remainder">
                                             <ButtonGroup data-bs-toggle="modal" data-bs-target="#kt_modal_10" variant="contained" aria-label="outlined primary button group">
-                                                <Button onClick={() => { setIdsdetail({ sender_id: userId, reciever_id: ticket.To, setUser: true }) }} className="btn btn-icon btn-light btn-hover-primary btn-sm"><ScheduleSendIcon className="svg-icon svg-icon-md svg-icon-primary" /></Button>
+                                                <Button onClick={() => { setIdsdetail({ sender_id: userIdRef.current, reciever_id: ticket.To, setUser: true }) }} className="btn btn-icon btn-light btn-hover-primary btn-sm"><ScheduleSendIcon className="svg-icon svg-icon-md svg-icon-primary" /></Button>
                                             </ButtonGroup>
                                         </Tooltip>
                                     </td>

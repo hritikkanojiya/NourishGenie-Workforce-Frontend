@@ -57,6 +57,7 @@ const AppRoutes: FC = () => {
       }
     }
     getUser()
+    console.log(currentUser, "currentUser1");
   }, [])
   return (
     <BrowserRouter basename={PUBLIC_URL}>
