@@ -383,7 +383,6 @@ const MyTicketMain = () => {
 
     const getAllUser = async () => {
 
-        console.log(userIdRef.current, "userIdRef.currentUP");
         const response = await fetch(`${API_URL}/ticketroutes/get_user`, {
             method: 'POST',
             headers: {
@@ -393,7 +392,6 @@ const MyTicketMain = () => {
                 loginUserId: userIdRef.current
             })
         });
-        console.log(userIdRef.current, "userIdRef.current");
         const json = await response.json()
         const already_user = new Map();
         for (let i = 0; i < json.allUsers.length; i++) {
@@ -490,6 +488,7 @@ const MyTicketMain = () => {
         for (let i = 0; i < selectedOptions.length; i++) {
             new_add_user.push(selectedOptions[i].value);
         }
+        new_add_user.push(userIdRef.current);
         const response = await fetch(
             `${API_URL}/ticketroutes/add_user`,
             {
@@ -536,7 +535,6 @@ const MyTicketMain = () => {
                   genie_access_token: 'Bearer ' + varToken,
                 },
               })
-              console.log(result.data.User.appUserId, "result.data");
               userIdRef.current = result.data.User.appUserId;
               getAllUser();
               getAllTicket(1, 10)
@@ -876,7 +874,7 @@ const MyTicketMain = () => {
                                                             className="btn btn-sm btn-primary my-5"
                                                             data-kt-menu-dismiss="true"
                                                         >
-                                                            Apply
+                                                            Add
                                                         </button>
                                                     </div>
                                                 </div>

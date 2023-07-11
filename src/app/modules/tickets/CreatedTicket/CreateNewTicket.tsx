@@ -107,7 +107,6 @@ const CreateNewTicket = (props: user_id) => {
                 for (let i = 0; i < selectedOptions.length; i++) {
                     all_send_to.push(selectedOptions[i].value);
                 }
-                console.log(response1, "response1");
                 const response = await fetch(`${API_URL}/ticketroutes/create_ticket`, {
                     method: 'POST',
                     headers: {
@@ -199,7 +198,6 @@ const CreateNewTicket = (props: user_id) => {
             })
         });
         const json = await response.json()
-        console.log(json, "json");
         setUserOptions(json.allUsers);
     }
 
@@ -340,7 +338,6 @@ const CreateNewTicket = (props: user_id) => {
                   genie_access_token: 'Bearer ' + varToken,
                 },
               })
-              console.log(result.data.User.appUserId, "result.data1");
               userIdRef.current = result.data.User.appUserId;
               getAllPriority();
               getAllCategory();

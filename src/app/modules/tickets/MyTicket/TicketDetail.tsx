@@ -57,7 +57,7 @@ const TicketDetail = (props: { _ticketdetail: ticket_detail }) => {
                                     {/* ------------- */}
                                     <div className='card-body p-9'>
                                         <div className='row mb-7'>
-                                            <label className='col-lg-4 fw-bold text-muted' onClick={() => { console.log(props, "_ticketdetail") }}>Subject</label>
+                                            <label className='col-lg-4 fw-bold text-muted'>Subject</label>
 
                                             <div className='col-lg-8'>
                                                 <span className='fw-bolder fs-6 text-dark'>{props._ticketdetail.subject}</span>
@@ -68,7 +68,7 @@ const TicketDetail = (props: { _ticketdetail: ticket_detail }) => {
                                             <label className='col-lg-4 fw-bold text-muted'>Content</label>
 
                                             <div className='col-lg-8 fv-row'>
-                                                <span className='fw-bold fs-6'>{props._ticketdetail.content}</span>
+                                                <span className='fw-bold fs-6'>{props._ticketdetail.content.length!==0 ? props._ticketdetail.content : <>Content is not available</>}</span>
                                             </div>
                                         </div>
 
@@ -120,7 +120,7 @@ const TicketDetail = (props: { _ticketdetail: ticket_detail }) => {
                                         {show_file && <span className='fw-bolder fs-6 text-dark my-5'>{props._ticketdetail.attachements?.map((file, index) =>
                                             <p>{index + 1}- [{file}] </p>
                                         )}</span>}
-                                        {!props._ticketdetail.attachements && <span className='fw-bolder fs-6 text-dark my-5'>No File Present</span>}</>)}
+                                        {!props._ticketdetail.attachements.length && <span className='fw-bolder fs-6 text-dark my-5'>No File Present</span>}</>)}
                                     </div>
                                     {/* ------------- */}
                                 </div>

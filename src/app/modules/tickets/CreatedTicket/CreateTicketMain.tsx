@@ -117,9 +117,6 @@ const Home = () => {
         const ticket_priority1 = [];
         const ticket_category1 = [];
         const ticket_status1 = [];
-        console.log(json.category_detail, "2");
-        console.log(json.priority_detail, "1");
-        console.log(json.status_detail, "3");
         for (let i = 0; i < json.priority_detail.length; i++) {
             ticket_priority.set(json.priority_detail[i]._id, [json.priority_detail[i].name, json.priority_detail[i].color]);
             ticket_priority1.push({ _id: json.priority_detail[i]._id, name: json.priority_detail[i].name, color: json.priority_detail[i].color });
@@ -162,8 +159,6 @@ const Home = () => {
     }
 
     const sortPriority = async (page: number, limit: number) => {
-        console.log(sortpriority, "sortstatus");
-        console.log(sortstatus, "sortstatus");
         const response = await fetch(`${API_URL}/ticketroutes/all_category_ticket`, {
             method: 'POST',
             headers: {
@@ -416,7 +411,6 @@ const Home = () => {
     const verify_user = async () => {
         //setUserId
         const varToken = localStorage.getItem('token');
-        console.log(varToken, "varToken");
         const response = await fetch(
             `${API_URL}/agent/auth/getAgentByToken`,
             {
@@ -429,20 +423,7 @@ const Home = () => {
                 })
             }
         );
-        // const varToken = localStorage.getItem('token');
-        // console.log(varToken, "varToken");
-        // const response = await fetch(
-        //     `${API_URL}/auth/user/verify_user`,
-        //     {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //         },
-        //         body: JSON.stringify({
-        //             userId: userIdRef.current
-        //         })
-        //     }
-        // );
+
         const json = await response.json();
         if (json.message !== 'success') {
             showToast(json.error.message, "error");
@@ -470,7 +451,6 @@ const Home = () => {
                   genie_access_token: 'Bearer ' + varToken,
                 },
               })
-              console.log(result.data.User.appUserId, "result.data");
               userIdRef.current = result.data.User.appUserId;
               getAllUser();
               getAllTicket(1, 10)
@@ -721,7 +701,7 @@ const Home = () => {
                                                         className="btn btn-sm btn-primary my-5"
                                                         data-kt-menu-dismiss="true"
                                                     >
-                                                        Apply
+                                                        Add
                                                     </button>
                                                 </div>
                                             </div>
